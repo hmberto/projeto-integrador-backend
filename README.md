@@ -2,4 +2,4 @@
 
 | Repository | URL |
 |--- |--- |
-| projeto-integrador | https://github.com/hmberto/projeto-integrador |
+| projeto-integrador | https://github.com/vinimelo92/projeto-integrador |
