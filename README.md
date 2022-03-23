@@ -9,7 +9,6 @@ Term Paper
 
 | Repository | URL |
 |--- |--- |
-<<<<<<< HEAD
 | projeto-integrador | https://github.com/hmberto/projeto-integrador |
 
 ## Java API. Maven Jetty plugin
@@ -29,12 +28,14 @@ In **./properties/data.properties** correctly fill your SQL database connection 
 mvn package jetty:run
 ~~~
 
+### Request
+~~~
+http://localhost:8186/EntregaFarmacias/
+~~~
+
 ## Why? 
 This project is a team work and was created as a term paper for learning purposes only. Also, you can use this Project as you wish.
 
 ## Built With
 * [Java](https://www.java.com/) - v1.8
 * [Maven Jetty Plugin](https://wiki.eclipse.org/Jetty/Feature/Jetty_Maven_Plugin) - v6.1.26
-=======
-| projeto-integrador | https://github.com/vinimelo92/projeto-integrador |
->>>>>>> e72855a8d456eaf72b8e683c8be3acc5ffe05ab1
