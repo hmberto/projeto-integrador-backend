@@ -4,13 +4,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "LogInUser")
 public class LogInUser {
-	public String getIP() {
-		return ip;
-	}
-	public void setIP(String ip) {
-		this.ip = ip;
-	}
-	
 	public String getEmail() {
 		return email;
 	}
@@ -32,7 +25,6 @@ public class LogInUser {
 		this.newLogin = newLogin;
 	}
 
-	String ip;
 	String email;
 	String pass;
 	String newLogin;

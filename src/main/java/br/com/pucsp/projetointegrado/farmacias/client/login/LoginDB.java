@@ -11,12 +11,14 @@ import java.util.logging.Logger;
 
 import br.com.pucsp.projetointegrado.farmacias.db.DB;
 import br.com.pucsp.projetointegrado.farmacias.mail.EmailConfirmation;
+import br.com.pucsp.projetointegrado.farmacias.utils.GetDateByIP;
+import br.com.pucsp.projetointegrado.farmacias.utils.GetZone;
 
 public class LoginDB {
 	public static String NAME = LoginDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(LoginDB.class.getName());
 	
-	public Map<Integer, String> LoginUser(String email, String pass, String newLogin, String IP) {
+	public Map<Integer, String> LoginUser(String userAgent, int SESSION_LENGTH, String email, String pass, String newLogin, String IP) {
 		LOG.entering(NAME, "LoginUser");
 		
 //		String sql = EnvVariables.getEnvVariable("DATABASE_GET_USER");
@@ -49,7 +51,7 @@ public class LoginDB {
 			String userSession = "";
 			if(user.get(2) == null || user.get(2).equals("null")) {}
 			else {
-				for(int i = 0; i < 50; i++) {
+				for(int i = 0; i < SESSION_LENGTH; i++) {
 					int myindex = (int)(alphaNumeric.length() * Math.random());
 					
 					userSession = userSession + alphaNumeric.charAt(myindex);
@@ -72,6 +74,10 @@ public class LoginDB {
 				String[] nomeSeparado = nome.split(" ");
 				
 				String messageSubject = "Entrega de Farmácias - Detectamos um novo acesso à sua conta";
+				
+				GetDateByIP getDate = new GetDateByIP();
+				GetZone getZone = new GetZone();
+				String info = userAgent + getDate.getData(IP) + "<br> " + getZone.getZone(IP);
 				
 				String messageText = "" 
 						+ "<!DOCTYPE html>\n"
@@ -103,12 +109,12 @@ public class LoginDB {
 						+ "  </div>\n"
 						+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 						+ "    <h2 class=\"size-24\" style=\"Margin-top: 0;Margin-bottom: 16px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 20px;line-height: 28px;text-align: center;\" lang=\"x-size-24\">\n"
-						+ "      " + IP + "<br><br>\n"
+						+ "      " + info + "<br><br>\n"
 						+ "    </h2>\n"
 						+ "  </div>\n"
 						+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 						+ "    <div class=\"btn btn--flat btn--large\" style=\"Margin-bottom: 20px;text-align: center;\">\n"
-						+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"https://.html?s=" + userSession + "\" target=\"_blank\">\n"
+						+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"https://pharmacy-delivery.herokuapp.com/client/logout/" + email + "\" target=\"_blank\">\n"
 						+ "        Não fui eu\n"
 						+ "      </a>\n"
 						+ "  </div>\n"
