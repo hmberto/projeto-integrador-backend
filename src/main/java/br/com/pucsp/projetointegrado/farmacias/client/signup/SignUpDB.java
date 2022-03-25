@@ -12,15 +12,15 @@ public class SignUpDB {
 	public static String NAME = SignUpDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(SignUpDB.class.getName());
 	
-	public boolean CreateUserDB(CreateUsers user) {
+	public boolean CreateUserDB(int SESSION_LENGTH, CreateUsers user) {
 		LOG.entering(NAME, "CreateUserDB");
 		
-		String sql = "INSERT INTO client (name, email, pass, street, number, complement, zip_code, state, city, district, cpf, birth_date, sex) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		String sql = "INSERT INTO client (name, email, pass, street, number, complement, zip_code, state, city, district, cpf, birth_date, sex, email_confirmation, email_confirmed) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		
 		String alphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		String emailSession = "";
 		
-		for(int i = 0; i < 50; i++) {
+		for(int i = 0; i < SESSION_LENGTH; i++) {
 			int myindex = (int)(alphaNumeric.length() * Math.random());
 			
 			emailSession = emailSession + alphaNumeric.charAt(myindex);
@@ -42,6 +42,8 @@ public class SignUpDB {
 			statement.setString(11, user.getCpf());
 			statement.setString(12, user.getBirthDate());
 			statement.setString(13, user.getSex());
+			statement.setString(14, emailSession);
+			statement.setBoolean(15, false);
 						
 			statement.execute();
 
@@ -86,17 +88,17 @@ public class SignUpDB {
 					+ "  </div>\n"
 					+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 					+ "    <h1 style=\"Margin-top: 0;Margin-bottom: 20px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 30px;line-height: 38px;text-align: center;\">\n"
-					+ "      " + welcome + nomeSeparado[0] + "! Clique no link a seguir para confirmar seu endereço de e-mail" + "\n"
+					+ "      " + welcome + nomeSeparado[0] + "! Confirme que este é seu endereço de e-mail." + "\n"
 					+ "    </h1>\n"
 					+ "  </div>\n"
 					+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 					+ "    <h2 class=\"size-24\" style=\"Margin-top: 0;Margin-bottom: 16px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 20px;line-height: 28px;text-align: center;\" lang=\"x-size-24\">\n"
-					+ "      " + "Clique no link abaixo para confirmar seu novo e-mail e voltar a utilizar sua conta<br><br>Se você não é " + user.getName() + ", desconsidere este e-mail" + "<br><br>\n"
+					+ "      " + "Clique no link abaixo para confirmar seu e-mail e liberar o acesso ao site.<br><br>Se você não é " + user.getName() + ", desconsidere este e-mail." + "<br><br>\n"
 					+ "    </h2>\n"
 					+ "  </div>\n"
 					+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 					+ "    <div class=\"btn btn--flat btn--large\" style=\"Margin-bottom: 20px;text-align: center;\">\n"
-					+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"https://.html?e=" + user.getEmail() + "&t=" + emailSession + "\" target=\"_blank\">\n"
+					+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"https://pharmacy-delivery.herokuapp.com/client/confirm-email/" + user.getEmail() + "/" + emailSession + "\" target=\"_blank\">\n"
 					+ "        Confirmar e-mail\n"
 					+ "      </a>\n"
 					+ "  </div>\n"
