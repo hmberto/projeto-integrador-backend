@@ -8,6 +8,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -82,7 +83,7 @@ public class Rest {
 		}
 	}
 	
-	@GET
+	@PUT
 	@Path("/client/logout/{session}")
 	public Response logoutUsers(@PathParam("session") String session) {
 		try {
@@ -90,9 +91,9 @@ public class Rest {
 			boolean check = logoutUser.logout(SESSION_LENGTH, session);
 			
 			if(check) {
-				return Response.temporaryRedirect(uri).build();
+				// return Response.temporaryRedirect(uri).build();
 				
-				// return Response.status(Response.Status.NO_CONTENT).build();
+				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 			else {
 				return Response.status(Response.Status.BAD_REQUEST).build();
