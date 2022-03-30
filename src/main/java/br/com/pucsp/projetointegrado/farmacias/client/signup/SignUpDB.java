@@ -1,7 +1,9 @@
 package br.com.pucsp.projetointegrado.farmacias.client.signup;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,9 +19,7 @@ public class SignUpDB {
 		LOG.entering(NAME, "CreateUserDB");
 		
 		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
-		
-		String sql = variables.get("SIGNUP");
-		
+				
 		String alphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		String emailSession = "";
 		
@@ -30,10 +30,15 @@ public class SignUpDB {
 		}
 		
 		try {
+			String idAddress = InsertAddress.insertAddress(variables, user, lat, lon);
+			
+			// String sql = "SELECT id_cidade FROM Cidade WHERE (nome LIKE ?);";
+			String sql = variables.get("SIGNUP");
+			
 			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 
 			statement.setString(1, user.getName());
-			statement.setString(2, user.getEmail());
+			statement.setString(2, user.getEmail().toLowerCase());
 			statement.setString(3, user.getPass());
 			statement.setString(4, user.getStreet());
 			statement.setString(5, user.getNumber());
