@@ -15,20 +15,26 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONObject;
+
 import br.com.pucsp.projetointegrado.farmacias.client.ConfirmEmail;
 import br.com.pucsp.projetointegrado.farmacias.client.LogIn;
 import br.com.pucsp.projetointegrado.farmacias.client.LogOut;
+import br.com.pucsp.projetointegrado.farmacias.client.Pharmacies;
 import br.com.pucsp.projetointegrado.farmacias.client.SignUp;
 import br.com.pucsp.projetointegrado.farmacias.client.login.GenerateLogin;
 import br.com.pucsp.projetointegrado.farmacias.client.login.LogInUser;
 import br.com.pucsp.projetointegrado.farmacias.client.signup.CreateUsers;
 import br.com.pucsp.projetointegrado.farmacias.utils.GetIPAddress;
 import br.com.pucsp.projetointegrado.farmacias.utils.GetUserAgent;
+import br.com.pucsp.projetointegrado.farmacias.utils.ProjectVariables;
 
 @Produces("application/json")
 @Consumes("application/json")
 public class Rest {
-	int SESSION_LENGTH = 100;
+	ProjectVariables projectVariables = new ProjectVariables();
+	Map <String, String> variables = projectVariables.projectVariables();
+	
 	URI uri = URI.create("https://projeto-integrador-frontend.herokuapp.com");
 	
 	@GET
@@ -44,25 +50,37 @@ public class Rest {
 	@POST
 	@Path("/client/login")
 	public Response loginUsers(@Context HttpServletRequest request, LogInUser login) {
+		boolean check = true;
 		try {
-			GetUserAgent getUserAgent = new GetUserAgent();
-			String userAgent = getUserAgent.getUserAgent(request);
+			int MAX_PASS_LENGTH = Integer.parseInt(variables.get("MAX_PASS_LENGTH"));
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			
-			GetIPAddress ipAddress = new GetIPAddress();
-			String IP = ipAddress.getIp(request);
+			boolean emailMatches = login.getEmail().matches(variables.get("REGEX_EMAIL"));
+			if(login.getEmail().length() > 10 && login.getEmail().length() < 60 && emailMatches) {}
+			else { check = false; }
 			
-			LogIn newLogin = new LogIn();
-			Map<Integer, String> session = newLogin.authenticateUser(userAgent, SESSION_LENGTH, login.getEmail(), login.getPass(), IP, login.getNewLogin());
+			boolean passMatches = login.getPass().matches(variables.get("REGEX_PASS"));
+			// if(login.getPass().length() >= MIN_PASS_LENGTH && login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
+			if(login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
+			else { check = false; }
 			
-			if(session.get(1).length() == SESSION_LENGTH) {
-				return Response.ok(new GenerateLogin(session)).build();
+			if(check) {
+				GetUserAgent getUserAgent = new GetUserAgent();
+				String userAgent = getUserAgent.getUserAgent(request);
+				
+				GetIPAddress ipAddress = new GetIPAddress();
+				String IP = ipAddress.getIp(request);
+				
+				LogIn newLogin = new LogIn();
+				Map<Integer, String> session = newLogin.authenticateUser(userAgent, variables, login.getEmail(), login.getPass(), IP, login.getNewLogin());
+				
+				if(session.get(1).length() == SESSION_LENGTH) {
+					return Response.ok(new GenerateLogin(session)).build();
+				}
 			}
-			else {
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			}
-		} catch (Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
+		} catch (Exception e) {}
+		
+		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 	
 	@POST
@@ -70,17 +88,15 @@ public class Rest {
 	public Response signupUsers(CreateUsers user) {
 		try {
 			SignUp SignUp = new SignUp();
-			boolean check = SignUp.createUser(SESSION_LENGTH, user);
+			boolean check = SignUp.createUser(variables, user);
 			
 			if(check) {
-				return Response.status(Response.Status.CREATED).build();			}
-			else {
-				return Response.status(Response.Status.BAD_REQUEST).build();
+				return Response.status(Response.Status.CREATED).build();
 			}
 		}
-		catch(Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
+		catch(Exception e) {}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@PUT
@@ -88,19 +104,15 @@ public class Rest {
 	public Response logoutUsers(@PathParam("session") String session) {
 		try {
 			LogOut logoutUser = new LogOut();
-			boolean check = logoutUser.logout(SESSION_LENGTH, session);
+			boolean check = logoutUser.logout(variables, session);
 			
 			if(check) {
-				// return Response.temporaryRedirect(uri).build();
-				
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
-			else {
-				return Response.status(Response.Status.BAD_REQUEST).build();
-			}
-		} catch (Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
+		} 
+		catch (Exception e) {}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
@@ -108,19 +120,32 @@ public class Rest {
 	public Response confirmEmail(@PathParam("token") String token, @PathParam("email") String email) {
 		try {
 			ConfirmEmail confirmEmail = new ConfirmEmail();
-			boolean check = confirmEmail.confirm(token, email);
+			boolean check = confirmEmail.confirm(variables, token, email);
 			
 			if(check) {
 				return Response.temporaryRedirect(uri).build();
-				
 				// return Response.status(Response.Status.NO_CONTENT).build();
 			}
-			else {
-				return Response.status(Response.Status.BAD_REQUEST).build();
+		} catch (Exception e) {}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/home/pharmacies/{distance}/{session}")
+	public Response getPharmacies(@PathParam("session") String session, @PathParam("distance") String distance) {
+		try {
+			if(distance.length() < 3) {
+				if(session.length() > 10 && session.length() < 250) {
+					Pharmacies pharmacies = new Pharmacies();
+					JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
+					
+					return Response.ok(payload.toString()).build();
+				}
 			}
-		} catch (Exception e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
+		} catch (Exception e) {}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@OPTIONS

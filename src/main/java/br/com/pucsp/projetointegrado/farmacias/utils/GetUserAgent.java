@@ -37,13 +37,13 @@ public class GetUserAgent {
 		else { OSName="Desconhecido"; }
 		
 		if(browser.contains("Desconhecido") && OSName.contains("Desconhecido")) {
-			user = "<br>";
+			user = "";
 		}
 		else if(browser.contains("Desconhecido")) {
-			user = OSName + "<br><br>";
+			user = "Sistema Operacional: " + OSName + "<br><br>";
 		}
 		else if (OSName.contains("Desconhecido")) {
-			user = browser + "<br><br>";
+			user = "Navegador: " + browser + "<br><br>";
 		}
 		else {
 			user = OSName + " - " + browser + "<br><br>";

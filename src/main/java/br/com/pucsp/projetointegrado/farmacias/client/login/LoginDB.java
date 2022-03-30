@@ -18,14 +18,16 @@ public class LoginDB {
 	public static String NAME = LoginDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(LoginDB.class.getName());
 	
-	public Map<Integer, String> LoginUser(String userAgent, int SESSION_LENGTH, String email, String pass, String newLogin, String IP) {
+	public Map<Integer, String> LoginUser(String userAgent, Map<String, String> variables, String email, String pass, String newLogin, String IP) {
 		LOG.entering(NAME, "LoginUser");
+		
+		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 		
 //		String sql = EnvVariables.getEnvVariable("DATABASE_GET_USER");
 //		String sql2 = EnvVariables.getEnvVariable("DATABASE_INSERT_USER_SESSION");
 		
-		String sql = "SELECT * FROM client WHERE (email LIKE ?) AND (pass LIKE ?);";
-		String sql2 = "UPDATE client SET session = ? WHERE (email LIKE ?);";
+		String sql = variables.get("LOGIN_1");
+		String sql2 = variables.get("LOGIN_2");
 		
 		Map<Integer, String> user = new HashMap<Integer, String>();
 		Map<Integer, String> session = new HashMap<Integer, String>();
@@ -34,7 +36,7 @@ public class LoginDB {
 		String nome = "";
 		
 		try {
-			PreparedStatement statement = DB.connect().prepareStatement(sql);
+			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 			statement.setString(1, email);
 			statement.setString(2, pass);
 			
@@ -58,7 +60,7 @@ public class LoginDB {
 				}
 			}
 			
-			PreparedStatement statement2 = DB.connect().prepareStatement(sql2);
+			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
 			statement2.setString(1, userSession);
 			statement2.setString(2, email);
 			
@@ -104,7 +106,7 @@ public class LoginDB {
 						+ "  </div>\n"
 						+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 						+ "    <h1 style=\"Margin-top: 0;Margin-bottom: 20px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 30px;line-height: 38px;text-align: center;\">\n"
-						+ "      " + nomeSeparado[0] + ", detectamos um novo acesso à sua conta" + "\n"
+						+ "      " + nomeSeparado[0] + ", detectamos um novo acesso à sua conta." + "\n"
 						+ "    </h1>\n"
 						+ "  </div>\n"
 						+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"

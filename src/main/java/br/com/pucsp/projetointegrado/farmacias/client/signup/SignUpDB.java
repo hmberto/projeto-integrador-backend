@@ -2,6 +2,7 @@ package br.com.pucsp.projetointegrado.farmacias.client.signup;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,10 +13,12 @@ public class SignUpDB {
 	public static String NAME = SignUpDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(SignUpDB.class.getName());
 	
-	public boolean CreateUserDB(int SESSION_LENGTH, CreateUsers user) {
+	public boolean CreateUserDB(Map <String, String> variables, CreateUsers user, String lat, String lon) {
 		LOG.entering(NAME, "CreateUserDB");
 		
-		String sql = "INSERT INTO client (name, email, pass, street, number, complement, zip_code, state, city, district, cpf, birth_date, sex, email_confirmation, email_confirmed) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+		
+		String sql = variables.get("SIGNUP");
 		
 		String alphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		String emailSession = "";
@@ -27,7 +30,7 @@ public class SignUpDB {
 		}
 		
 		try {
-			PreparedStatement statement = DB.connect().prepareStatement(sql);
+			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail());
@@ -44,6 +47,8 @@ public class SignUpDB {
 			statement.setString(13, user.getSex());
 			statement.setString(14, emailSession);
 			statement.setBoolean(15, false);
+			statement.setString(16, lat);
+			statement.setString(17, lon);
 						
 			statement.execute();
 

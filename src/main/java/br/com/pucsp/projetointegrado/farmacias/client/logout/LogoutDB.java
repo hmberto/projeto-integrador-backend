@@ -16,17 +16,17 @@ public class LogoutDB {
 	private static Logger LOG = Logger.getLogger(LogoutDB.class.getName());
 	private boolean check = false;
 	
-	public boolean LogoutUser(String sql, String sessionId) {
+	public boolean LogoutUser(Map <String, String> variables, String sql, String sessionId) {
 		LOG.entering(NAME, "LogoutUser");
 		System.out.println("\n\nsession");
 		
-		String sql2 = "UPDATE client SET session = ? WHERE (email LIKE ?);";
+		String sql2 = variables.get("LOGOUT_3");
 		
 		Map<Integer, String> user = new HashMap<Integer, String>();
 		Map<Integer, String> session = new HashMap<Integer, String>();
 		
 		try {
-			PreparedStatement statement = DB.connect().prepareStatement(sql);
+			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 			statement.setString(1, sessionId);
 			
 			ResultSet f = statement.executeQuery();
@@ -41,7 +41,7 @@ public class LogoutDB {
 			
 			String userSession = "";
 			
-			PreparedStatement statement2 = DB.connect().prepareStatement(sql2);
+			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
 			statement2.setString(1, "NULL");
 			statement2.setString(2, user.get(2));
 			

@@ -3,6 +3,7 @@ package br.com.pucsp.projetointegrado.farmacias.client.confirmemail;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,15 +14,15 @@ public class ConfirmEmailDB {
 	public static String NAME = ConfirmEmailDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(ConfirmEmailDB.class.getName());
 	
-	public boolean confirmation(String token, String email) {
+	public boolean confirmation(Map <String, String> variables, String token, String email) {
 		LOG.entering(NAME, "confirmation");
 		
-		String sql = "UPDATE client SET email_confirmed = true WHERE (email_confirmation LIKE ?) AND (email LIKE ?);";
-		String sql1 = "SELECT * FROM client WHERE (email LIKE ?);";
-		String sql2 = "UPDATE client SET email_confirmation = ? WHERE (email LIKE ?);";
+		String sql = variables.get("EMAIL_CONFIRMATION_1");
+		String sql1 = variables.get("EMAIL_CONFIRMATION_2");
+		String sql2 = variables.get("EMAIL_CONFIRMATION_3");
 		
 		try {
-			PreparedStatement statement1 = DB.connect().prepareStatement(sql1);
+			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
 			statement1.setString(1, email);
 			
 			ResultSet f = statement1.executeQuery();
@@ -34,14 +35,14 @@ public class ConfirmEmailDB {
 			}
 						
 			if(validate) {
-				PreparedStatement statement = DB.connect().prepareStatement(sql);
+				PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 				statement.setString(1, token);
 				statement.setString(2, email);
 				
 				statement.execute();
 				statement.close();
 				
-				PreparedStatement statement2 = DB.connect().prepareStatement(sql2);
+				PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
 				statement2.setString(1, "NULL");
 				statement2.setString(2, email);
 				
@@ -99,19 +100,16 @@ public class ConfirmEmailDB {
 				LOG.exiting(NAME, "confirmation");
 				return true;
 			}
-			else {
-				LOG.exiting(NAME, "confirmation");
-				return false;
-			}
 		}
 		catch (SQLException e) {
 			LOG.log(Level.SEVERE, "Failed confirmation - E-mail: " + email + " - Erro: " + e);
 			
 			LOG.exiting(NAME, "confirmation");
-			return false;
 		}
 		finally {
 			DB.disconnect();
 		}
+		
+		return false;
 	}
 }
