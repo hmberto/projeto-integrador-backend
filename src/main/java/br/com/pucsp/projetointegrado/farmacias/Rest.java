@@ -78,7 +78,7 @@ public class Rest {
 				String IP = ipAddress.getIp(request);
 				
 				LogIn newLogin = new LogIn();
-				Map<Integer, String> session = newLogin.authenticateUser(userAgent, variables, login.getEmail(), login.getPass(), IP, login.getNewLogin());
+				Map<Integer, String> session = newLogin.authenticateUser(userAgent, variables, login.getEmail().toLowerCase(), login.getPass(), IP, login.getNewLogin());
 				
 				if(session.get(1).length() == SESSION_LENGTH) {
 					LOG.exiting(NAME, "loginUsers");
@@ -89,7 +89,6 @@ public class Rest {
 			LOG.log(Level.SEVERE, "User not authenticated: " + e);
 		}
 		
-		LOG.log(Level.INFO, "Couldn't authenticate user!");
 		LOG.exiting(NAME, "loginUsers");
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}

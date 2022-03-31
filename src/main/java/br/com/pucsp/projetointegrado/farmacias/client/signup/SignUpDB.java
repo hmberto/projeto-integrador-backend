@@ -28,35 +28,39 @@ public class SignUpDB {
 		
 		try {
 			String idAddress = InsertAddress.insertAddress(variables, user, lat, lon);
+			String idSex = InsertSex.insertSex(variables, user.getSex());
 			
-			// String sql = "SELECT id_cidade FROM Cidade WHERE (nome LIKE ?);";
-			String sql = variables.get("SIGNUP");
+			String sql = "INSERT INTO Usuario (nome, email, cpf, ativo, birth_date, token_confirmacao_cadastro, id_genero, id_endereco) values (?, ?, ?, ?, ?, ?, ?, ?);";
+			// String sql = variables.get("SIGNUP");
 			
 			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
-
+			
 			statement.setString(1, user.getName());
 			statement.setString(2, user.getEmail().toLowerCase());
-			statement.setString(3, user.getPass());
-			statement.setString(4, user.getStreet());
-			statement.setString(5, user.getNumber());
-			statement.setString(6, user.getComplement());
-			statement.setString(7, user.getZipCode());
-			statement.setString(8, user.getState());
-			statement.setString(9, user.getCity());
-			statement.setString(10, user.getDistrict());
-			statement.setString(11, user.getCpf());
-			statement.setString(12, user.getBirthDate());
-			statement.setString(13, user.getSex());
-			statement.setString(14, emailSession);
-			statement.setBoolean(15, false);
-			statement.setString(16, lat);
-			statement.setString(17, lon);
+			statement.setString(3, user.getCpf());
+			statement.setBoolean(4, false);
+			statement.setString(5, user.getBirthDate());
+			statement.setString(6, emailSession);
+			statement.setInt(7, Integer.parseInt(idSex));
+			statement.setInt(8, Integer.parseInt(idAddress));
 						
 			statement.execute();
-
-			LOG.log(Level.INFO, "User created on database. Name: " + user.getName() + " - Email: " + user.getEmail());
-			
 			statement.close();
+			
+			String userId = GetUserID.getUserID(variables, user.getEmail(), user.getCpf());
+			String passId = InsertPass.insertPass(variables, user.getPass(), userId, emailSession);
+			String sqlPass = "INSERT INTO Login_Sessao (id_session, id_usuario, id_senha) values (?, ?, ?);";
+			
+			PreparedStatement statementSession = DB.connect(variables).prepareStatement(sqlPass);
+			
+			statementSession.setString(1, "NULL");
+			statementSession.setString(2, userId);
+			statementSession.setString(3, passId);
+						
+			statementSession.execute();
+			statementSession.close();
+			
+			LOG.log(Level.INFO, "User created on database. ID: " + userId + " - Name: " + user.getName() + " - Email: " + user.getEmail());
 			
 			String welcome = "";
 			if (user.getSex().equals("2")) {
