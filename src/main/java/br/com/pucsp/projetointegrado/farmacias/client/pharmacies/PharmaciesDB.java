@@ -2,16 +2,22 @@ package br.com.pucsp.projetointegrado.farmacias.client.pharmacies;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrado.farmacias.db.DB;
 
 public class PharmaciesDB {
-	public StringBuffer getPharmacies(Map <String, String> variables, String distance, String session) {		
+	public static String NAME = PharmaciesDB.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(PharmaciesDB.class.getName());
+	
+	public StringBuffer getPharmacies(Map <String, String> variables, String distance, String session) {
+		LOG.entering(NAME, "getPharmacies");
+		
 		String sql1 = variables.get("PHARMACY");
 		
 		Map<Integer, String> user = new HashMap<Integer, String>();
@@ -30,6 +36,8 @@ public class PharmaciesDB {
 					user.put(1, f1.getString(17));
 					user.put(2, f1.getString(18));
 				}
+				
+				LOG.log(Level.INFO, "User coordinates found - Lat: " + user.get(1) + " - Lon: " + user.get(2));
 			}
 			
 			statement1.close();
@@ -47,6 +55,8 @@ public class PharmaciesDB {
 			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 						
 			ResultSet f = statement.executeQuery();
+			
+			LOG.log(Level.INFO, "Nearby pharmacies getted from DB");
 			
 			createPayload.object();
 			
@@ -70,15 +80,16 @@ public class PharmaciesDB {
 			
 			statement.close();
 		}
-		catch (SQLException e) {
-			// LOG.log(Level.SEVERE, "Data not geted from the database: ", e);
-			System.out.println(e);
+		catch (Exception e) {
+			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
 		}
 		finally {
 			DB.disconnect();
 		}
 		
 		// LOG.exiting(NAME, "GetCar");
+		LOG.log(Level.INFO, "Nearby pharmacies payload: " + payload);
+		LOG.exiting(NAME, "getPharmacies");
 		return payload;
 	}
 }

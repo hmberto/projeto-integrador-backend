@@ -18,7 +18,6 @@ public class LogoutDB {
 	
 	public boolean LogoutUser(Map <String, String> variables, String sql, String sessionId) {
 		LOG.entering(NAME, "LogoutUser");
-		System.out.println("\n\nsession");
 		
 		String sql2 = variables.get("LOGOUT_3");
 		
@@ -54,7 +53,7 @@ public class LogoutDB {
 			check = true;
 		}
 		catch (SQLException e) {
-			LOG.log(Level.SEVERE, "Data not geted from the database: ", e);
+			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
 		}
 		finally {
 			DB.disconnect();

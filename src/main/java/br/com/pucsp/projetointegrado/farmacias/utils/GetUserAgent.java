@@ -1,9 +1,16 @@
 package br.com.pucsp.projetointegrado.farmacias.utils;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 
 public class GetUserAgent {
+	public static String NAME = GetUserAgent.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(GetUserAgent.class.getName());
+	
 	public String getUserAgent(HttpServletRequest request) {
+		LOG.entering(NAME, "getUserAgent");
 		String userAgent = request.getHeader("User-Agent").toUpperCase();
 		
 		String browser = "";
@@ -38,17 +45,22 @@ public class GetUserAgent {
 		
 		if(browser.contains("Desconhecido") && OSName.contains("Desconhecido")) {
 			user = "";
+			LOG.log(Level.INFO, "Unidentified user's operating system and browser!");
 		}
 		else if(browser.contains("Desconhecido")) {
 			user = "Sistema Operacional: " + OSName + "<br><br>";
+			LOG.log(Level.INFO, "Unidentified user's browser! User's Operating system: " + OSName);
 		}
 		else if (OSName.contains("Desconhecido")) {
 			user = "Navegador: " + browser + "<br><br>";
+			LOG.log(Level.INFO, "Unidentified user's operating system! User's Browser: " + browser);
 		}
 		else {
 			user = OSName + " - " + browser + "<br><br>";
+			LOG.log(Level.INFO, "User's operating system: " + OSName + " - User's Browser: " + browser);
 		}
 		
+		LOG.exiting(NAME, "getUserAgent");
 		return user;
 	}
 }

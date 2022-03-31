@@ -1,6 +1,7 @@
 package br.com.pucsp.projetointegrado.farmacias.mail;
 
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.Address;
@@ -18,6 +19,8 @@ public class EmailConfirmation {
 	
 	public void confirmation(String destinatário, String messageSubject, String messageSend) {
 		LOG.entering(NAME, "confirmation");
+		
+		LOG.log(Level.INFO, "Sending email to " + destinatário);
 		
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com");
@@ -44,11 +47,11 @@ public class EmailConfirmation {
 			message.setRecipients(Message.RecipientType.TO, toUser);
 			message.setSubject(messageSubject);
 			message.setContent(messageSend, "text/html");
-
-			/** Método para enviar a mensagem criada */
+			
 			Transport.send(message);
+			LOG.log(Level.INFO, "Email sent to " + destinatário);
 		} catch (MessagingException e) {
-			throw new RuntimeException(e);
+			LOG.log(Level.SEVERE, "It wasn't possible to send the email: " + e);
 		}
 		LOG.exiting(NAME, "confirmation");
 	}

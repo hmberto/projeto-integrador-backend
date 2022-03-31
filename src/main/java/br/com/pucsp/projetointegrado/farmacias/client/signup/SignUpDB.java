@@ -1,9 +1,6 @@
 package br.com.pucsp.projetointegrado.farmacias.client.signup;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,7 +54,7 @@ public class SignUpDB {
 						
 			statement.execute();
 
-			LOG.log(Level.INFO, "User created on database. Email: " + user.getEmail());
+			LOG.log(Level.INFO, "User created on database. Name: " + user.getName() + " - Email: " + user.getEmail());
 			
 			statement.close();
 			
@@ -121,8 +118,8 @@ public class SignUpDB {
 			LOG.exiting(NAME, "CreateUserDB");
 			return true;
 		}
-		catch(SQLException e) {
-			LOG.log(Level.SEVERE, "User not created on the database: ", e);
+		catch(Exception e) {
+			LOG.log(Level.SEVERE, "User not created on the database: " + e);
 		}
 		finally {
 			DB.disconnect();

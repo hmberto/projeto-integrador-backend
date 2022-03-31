@@ -2,6 +2,8 @@ package br.com.pucsp.projetointegrado.farmacias;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -32,6 +34,9 @@ import br.com.pucsp.projetointegrado.farmacias.utils.ProjectVariables;
 @Produces("application/json")
 @Consumes("application/json")
 public class Rest {
+	public static String NAME = Rest.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(Rest.class.getName());
+	
 	ProjectVariables projectVariables = new ProjectVariables();
 	Map <String, String> variables = projectVariables.projectVariables();
 	
@@ -50,6 +55,7 @@ public class Rest {
 	@POST
 	@Path("/client/login")
 	public Response loginUsers(@Context HttpServletRequest request, LogInUser login) {
+		LOG.entering(NAME, "loginUsers");
 		boolean check = true;
 		try {
 			int MAX_PASS_LENGTH = Integer.parseInt(variables.get("MAX_PASS_LENGTH"));
@@ -75,76 +81,105 @@ public class Rest {
 				Map<Integer, String> session = newLogin.authenticateUser(userAgent, variables, login.getEmail(), login.getPass(), IP, login.getNewLogin());
 				
 				if(session.get(1).length() == SESSION_LENGTH) {
+					LOG.exiting(NAME, "loginUsers");
 					return Response.ok(new GenerateLogin(session)).build();
 				}
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "User not authenticated: " + e);
+		}
 		
+		LOG.log(Level.INFO, "Couldn't authenticate user!");
+		LOG.exiting(NAME, "loginUsers");
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 	
 	@POST
 	@Path("/client/signup")
 	public Response signupUsers(CreateUsers user) {
+		LOG.entering(NAME, "signupUsers");
 		try {
 			SignUp SignUp = new SignUp();
 			boolean check = SignUp.createUser(variables, user);
 			
 			if(check) {
+				LOG.exiting(NAME, "signupUsers");
 				return Response.status(Response.Status.CREATED).build();
 			}
 		}
-		catch(Exception e) {}
+		catch(Exception e) {
+			LOG.log(Level.SEVERE, "User not created: " + e);
+		}
 		
+		LOG.log(Level.INFO, "Couldn't create user!");
+		LOG.exiting(NAME, "signupUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@PUT
 	@Path("/client/logout/{session}")
 	public Response logoutUsers(@PathParam("session") String session) {
+		LOG.entering(NAME, "logoutUsers");
 		try {
 			LogOut logoutUser = new LogOut();
 			boolean check = logoutUser.logout(variables, session);
 			
 			if(check) {
+				LOG.exiting(NAME, "logoutUsers");
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		} 
-		catch (Exception e) {}
+		catch (Exception e) {
+			LOG.log(Level.SEVERE, "User not unauthenticated: " + e);
+		}
 		
+		LOG.log(Level.INFO, "Couldn't logout user!");
+		LOG.exiting(NAME, "logoutUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/client/confirm-email/{email}/{token}")
 	public Response confirmEmail(@PathParam("token") String token, @PathParam("email") String email) {
+		LOG.entering(NAME, "confirmEmail");
 		try {
 			ConfirmEmail confirmEmail = new ConfirmEmail();
 			boolean check = confirmEmail.confirm(variables, token, email);
 			
 			if(check) {
+				LOG.exiting(NAME, "confirmEmail");
 				return Response.temporaryRedirect(uri).build();
 				// return Response.status(Response.Status.NO_CONTENT).build();
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "User not confirmed: " + e);
+		}
 		
+		LOG.log(Level.INFO, "Couldn't confirm user!");
+		LOG.exiting(NAME, "confirmEmail");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/home/pharmacies/{distance}/{session}")
 	public Response getPharmacies(@PathParam("session") String session, @PathParam("distance") String distance) {
+		LOG.entering(NAME, "getPharmacies");
 		try {
 			if(distance.length() < 3) {
 				if(session.length() > 10 && session.length() < 250) {
 					Pharmacies pharmacies = new Pharmacies();
 					JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
 					
+					LOG.exiting(NAME, "getPharmacies");
 					return Response.ok(payload.toString()).build();
 				}
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
+		}
 		
+		LOG.log(Level.INFO, "Couldn't find pharmacies!");
+		LOG.exiting(NAME, "getPharmacies");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	

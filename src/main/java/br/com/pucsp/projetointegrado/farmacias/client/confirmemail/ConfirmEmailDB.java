@@ -103,13 +103,12 @@ public class ConfirmEmailDB {
 		}
 		catch (SQLException e) {
 			LOG.log(Level.SEVERE, "Failed confirmation - E-mail: " + email + " - Erro: " + e);
-			
-			LOG.exiting(NAME, "confirmation");
 		}
 		finally {
 			DB.disconnect();
 		}
 		
+		LOG.exiting(NAME, "confirmation");
 		return false;
 	}
 }

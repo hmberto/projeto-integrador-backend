@@ -47,7 +47,7 @@ public class DB {
 				
 				LOG.log(Level.INFO, "Connection started");
 			} catch (Exception e) {
-				LOG.log(Level.SEVERE, "Connection not started", e);
+				LOG.log(Level.SEVERE, "Connection not started" + e);
 			}
 		}
 		
@@ -65,7 +65,7 @@ public class DB {
                 
                 LOG.log(Level.INFO, "Connection closed");
             } catch (SQLException e) {
-            	LOG.log(Level.SEVERE, "Connection not closed", e);
+            	LOG.log(Level.SEVERE, "Connection not closed" + e);
             }
         }
         

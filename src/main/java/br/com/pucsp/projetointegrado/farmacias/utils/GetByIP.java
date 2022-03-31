@@ -5,9 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GetByIP {
+	public static String NAME = GetByIP.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(GetByIP.class.getName());
+	
 	public String getData(String IP) {
+		LOG.entering(NAME, "getData");
 		String url = "http://worldtimeapi.org/api/ip/" + IP;
 		
 		try {
@@ -29,12 +35,14 @@ public class GetByIP {
 	        
 	        conn.disconnect();
 	        
+	        LOG.exiting(NAME, "getData");
 	        return output;
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			LOG.log(Level.SEVERE, "GetByIP.getData: " + e);
 		}
 		
+		LOG.exiting(NAME, "getData");
 		return "";
 	}
 }

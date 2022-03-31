@@ -6,10 +6,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import br.com.pucsp.projetointegrado.farmacias.db.DB;
 
 public class InsertAddress {
+	public static String NAME = InsertAddress.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(InsertAddress.class.getName());
+	
 	public static String insertAddress(Map<String, String> variables, CreateUsers user, String lat, String lon) {
+		LOG.entering(NAME, "insertAddress");
+		
 		Map<String, String> states = states();
 		List<String> streetType = streetType();
 		
@@ -169,12 +177,19 @@ public class InsertAddress {
 			statementAddress.close();
 			getIdAddressStat.close();
 			
+			LOG.log(Level.INFO, "User address created at address table! Address ID: " + idAddressGetted);
+			
+			LOG.exiting(NAME, "insertAddress");
 			return idAddressGetted;
 		}
-		catch (Exception e) {}
+		catch (Exception e) {
+			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
+		}
 		finally {
 			DB.disconnect();
 		}
+		
+		LOG.exiting(NAME, "insertAddress");
 		return "";
 	}
 	

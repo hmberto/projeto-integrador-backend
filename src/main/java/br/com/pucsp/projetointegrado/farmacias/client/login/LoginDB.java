@@ -128,7 +128,7 @@ public class LoginDB {
 			}
 		}
 		catch (SQLException e) {
-			LOG.log(Level.SEVERE, "Data not geted from the database: ", e);
+			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
 		}
 		finally {
 			DB.disconnect();

@@ -5,9 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GetZoneByIP {
+	public static String NAME = GetZoneByIP.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(GetZoneByIP.class.getName());
+	
 	public String getData(String IP) {
+		LOG.entering(NAME, "getData");
 		String url = "https://ipapi.co/" + IP + "/json/";
 		
 		try {
@@ -17,7 +23,7 @@ public class GetZoneByIP {
 	        conn.setRequestProperty("Accept", "application/json");
 	        
 	        if (conn.getResponseCode() != 200) {
-	            System.out.println("Erro " + conn.getResponseCode() + " ao obter dados da URL " + url);
+	            LOG.log(Level.SEVERE, "Erro " + conn.getResponseCode() + " ao obter dados da URL " + url);
 	        }
 	        
 	        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -30,12 +36,14 @@ public class GetZoneByIP {
 	        
 	        conn.disconnect();
 	        
+	        LOG.exiting(NAME, "getData");
 	        return output;
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			LOG.log(Level.SEVERE, "Zone by IP not getted: " + e);
 		}
 		
+		LOG.exiting(NAME, "getData");
 		return "";
 	}
 }

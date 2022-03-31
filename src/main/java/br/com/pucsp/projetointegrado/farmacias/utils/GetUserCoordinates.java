@@ -5,9 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GetUserCoordinates {
+	public static String NAME = GetUserCoordinates.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(GetUserCoordinates.class.getName());
+	
 	public String coordinates(String street, String number) {
+		LOG.entering(NAME, "coordinates");
 		String[] streetSplit= street.split(" ");
 		
 		String output = "";
@@ -29,7 +35,7 @@ public class GetUserCoordinates {
 			conn.setRequestMethod("GET");
 	        
 	        if (conn.getResponseCode() != 200) {
-	            System.out.println("Erro " + conn.getResponseCode() + " ao obter dados da URL " + url);
+	            LOG.log(Level.SEVERE, "Erro " + conn.getResponseCode() + " ao obter dados da URL " + url);
 	        }
 	        
 	        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -42,9 +48,11 @@ public class GetUserCoordinates {
 	        conn.disconnect();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			LOG.log(Level.SEVERE, "User coordinates not geted: " + e);
 		}
 		
+		LOG.log(Level.INFO, "User coordinates getted");
+		LOG.exiting(NAME, "coordinates");
 		return output;
 	}
 }

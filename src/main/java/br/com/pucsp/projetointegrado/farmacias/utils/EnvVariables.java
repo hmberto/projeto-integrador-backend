@@ -7,7 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EnvVariables {
-	protected static Logger LOG = Logger.getLogger(EnvVariables.class.getName());
+	public static String NAME = EnvVariables.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(EnvVariables.class.getName());
 	
 	public static String envVariables(String variablesName) throws IOException {
         FileInputStream in = new FileInputStream("properties/data.properties");
@@ -25,7 +26,7 @@ public class EnvVariables {
 		try {
 			env = envVariables(variablesName);
 		} catch (IOException e) {
-			LOG.log(Level.SEVERE, "Variável não encontrada: " + e.getMessage(), e);
+			LOG.log(Level.SEVERE, "Variável não encontrada: " + e.getMessage() + "\n-\n" + e);
 		}
 		return env;
 	}
