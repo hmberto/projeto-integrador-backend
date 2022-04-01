@@ -68,7 +68,7 @@ public class CheckSignUp {
 		}
 		
 		// Verifica E-mail
-		boolean searchForCharactersF = user.getEmail().matches(variables.get("REGEX_EMAIL"));
+		boolean searchForCharactersF = user.getEmail().toLowerCase().matches(variables.get("REGEX_EMAIL"));
 		if(user.getEmail().length() < 60 && searchForCharactersF) {
 			LOG.log(Level.INFO, "checkData.checkData: Email OK");
 		}
