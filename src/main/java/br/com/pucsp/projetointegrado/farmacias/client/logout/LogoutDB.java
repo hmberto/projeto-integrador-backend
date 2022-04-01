@@ -1,9 +1,7 @@
 package br.com.pucsp.projetointegrado.farmacias.client.logout;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import java.util.logging.Level;
@@ -16,44 +14,23 @@ public class LogoutDB {
 	private static Logger LOG = Logger.getLogger(LogoutDB.class.getName());
 	private boolean check = false;
 	
-	public boolean LogoutUser(Map <String, String> variables, String sql, String sessionId) {
+	public boolean LogoutUser(Map <String, String> variables, String sessionId) {
 		LOG.entering(NAME, "LogoutUser");
 		
-		String sql2 = variables.get("LOGOUT_3");
-		
-		Map<Integer, String> user = new HashMap<Integer, String>();
-		Map<Integer, String> session = new HashMap<Integer, String>();
+		String sql = "UPDATE Login_Sessao SET id_session = ? WHERE (id_session LIKE ?);";
 		
 		try {
 			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
-			statement.setString(1, sessionId);
+			statement.setString(1, "NULL");
+			statement.setString(2, sessionId);
 			
-			ResultSet f = statement.executeQuery();
-			
-			while(f.next()) {
-				for(int i = 1; i < 14; i++) {
-					user.put(i, f.getString(i));
-				}
-				
-				LOG.log(Level.INFO, "Data geted from the database. Email: " + f.getString(2));
-			}
-			
-			String userSession = "";
-			
-			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
-			statement2.setString(1, "NULL");
-			statement2.setString(2, user.get(2));
-			
-			statement2.execute();
-			
-			session.put(1, userSession);
-						
+			statement.execute();			
 			statement.close();
 			
 			check = true;
 		}
 		catch (SQLException e) {
-			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
+			LOG.log(Level.SEVERE, "LogoutDB.LogoutUser Error: : " + e);
 		}
 		finally {
 			DB.disconnect();

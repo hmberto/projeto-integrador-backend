@@ -12,11 +12,9 @@ public class SignUpDB {
 	public static String NAME = SignUpDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(SignUpDB.class.getName());
 	
-	public boolean CreateUserDB(Map <String, String> variables, CreateUsers user, String lat, String lon) {
+	public boolean CreateUserDB(Map <String, String> variables, CreateUsers user, String lat, String lon, int SESSION_LENGTH) {
 		LOG.entering(NAME, "CreateUserDB");
-		
-		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
-				
+						
 		String alphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		String emailSession = "";
 		
@@ -47,7 +45,7 @@ public class SignUpDB {
 			statement.execute();
 			statement.close();
 			
-			String userId = GetUserID.getUserID(variables, user.getEmail(), user.getCpf());
+			String userId = GetUserID.getUserID(variables, user.getEmail().toLowerCase(), user.getCpf());
 			String passId = InsertPass.insertPass(variables, user.getPass(), userId, emailSession);
 			String sqlPass = "INSERT INTO Login_Sessao (id_session, id_usuario, id_senha) values (?, ?, ?);";
 			
@@ -60,7 +58,7 @@ public class SignUpDB {
 			statementSession.execute();
 			statementSession.close();
 			
-			LOG.log(Level.INFO, "User created on database. ID: " + userId + " - Name: " + user.getName() + " - Email: " + user.getEmail());
+			LOG.log(Level.INFO, "User created on database. ID: " + userId + " - Name: " + user.getName() + " - Email: " + user.getEmail().toLowerCase());
 			
 			String welcome = "";
 			if (user.getSex().equals("2")) {
@@ -109,7 +107,7 @@ public class SignUpDB {
 					+ "  </div>\n"
 					+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 					+ "    <div class=\"btn btn--flat btn--large\" style=\"Margin-bottom: 20px;text-align: center;\">\n"
-					+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"https://pharmacy-delivery.herokuapp.com/client/confirm-email/" + user.getEmail() + "/" + emailSession + "\" target=\"_blank\">\n"
+					+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"https://pharmacy-delivery.herokuapp.com/client/confirm-email/" + user.getEmail().toLowerCase() + "/" + emailSession + "\" target=\"_blank\">\n"
 					+ "        Confirmar e-mail\n"
 					+ "      </a>\n"
 					+ "  </div>\n"
@@ -117,7 +115,7 @@ public class SignUpDB {
 					+ "</html>";
 			
 			EmailConfirmation sendEmail = new EmailConfirmation();
-			sendEmail.confirmation(user.getEmail(), messageSubject, messageText);
+			sendEmail.confirmation(user.getEmail().toLowerCase(), messageSubject, messageText);
 			
 			LOG.exiting(NAME, "CreateUserDB");
 			return true;
