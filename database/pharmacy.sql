@@ -365,7 +365,9 @@ CREATE TABLE `Genero` (
   `id_genero` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(50) NOT NULL,
   `sigla` char(10) NOT NULL,
-  PRIMARY KEY (`id_genero`)
+  PRIMARY KEY (`id_genero`),
+  UNIQUE KEY `nome` (`nome`),
+  UNIQUE KEY `sigla` (`sigla`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -581,4 +583,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-31  0:38:24
+-- Dump completed on 2022-04-01 12:13:59
