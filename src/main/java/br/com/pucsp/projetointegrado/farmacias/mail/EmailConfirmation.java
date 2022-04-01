@@ -36,7 +36,7 @@ public class EmailConfirmation {
 		});
 
 		/** Ativa Debug para sessão */
-		session.setDebug(true);
+		session.setDebug(false);
 
 		try {
 			Message message = new MimeMessage(session);
