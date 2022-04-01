@@ -59,6 +59,7 @@ public class Rest {
 		boolean check = true;
 		try {
 			int MAX_PASS_LENGTH = Integer.parseInt(variables.get("MAX_PASS_LENGTH"));
+			int MIN_PASS_LENGTH = Integer.parseInt(variables.get("MIN_PASS_LENGTH"));
 			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			
 			boolean emailMatches = login.getEmail().matches(variables.get("REGEX_EMAIL"));
@@ -67,7 +68,7 @@ public class Rest {
 			
 			boolean passMatches = login.getPass().matches(variables.get("REGEX_PASS"));
 			// if(login.getPass().length() >= MIN_PASS_LENGTH && login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
-			if(login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
+			if(login.getPass().length() >= MIN_PASS_LENGTH && login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
 			else { check = false; }
 			
 			if(check) {
@@ -97,9 +98,11 @@ public class Rest {
 	@Path("/client/signup")
 	public Response signupUsers(CreateUsers user) {
 		LOG.entering(NAME, "signupUsers");
+		
 		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			SignUp SignUp = new SignUp();
-			boolean check = SignUp.createUser(variables, user);
+			boolean check = SignUp.createUser(variables, user, SESSION_LENGTH);
 			
 			if(check) {
 				LOG.exiting(NAME, "signupUsers");
@@ -119,9 +122,11 @@ public class Rest {
 	@Path("/client/logout/{session}")
 	public Response logoutUsers(@PathParam("session") String session) {
 		LOG.entering(NAME, "logoutUsers");
+		
 		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			LogOut logoutUser = new LogOut();
-			boolean check = logoutUser.logout(variables, session);
+			boolean check = logoutUser.logout(variables, session, SESSION_LENGTH);
 			
 			if(check) {
 				LOG.exiting(NAME, "logoutUsers");
@@ -141,9 +146,11 @@ public class Rest {
 	@Path("/client/confirm-email/{email}/{token}")
 	public Response confirmEmail(@PathParam("token") String token, @PathParam("email") String email) {
 		LOG.entering(NAME, "confirmEmail");
+		
 		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			ConfirmEmail confirmEmail = new ConfirmEmail();
-			boolean check = confirmEmail.confirm(variables, token, email);
+			boolean check = confirmEmail.confirm(variables, token, email.toLowerCase(), SESSION_LENGTH);
 			
 			if(check) {
 				LOG.exiting(NAME, "confirmEmail");
@@ -164,8 +171,9 @@ public class Rest {
 	public Response getPharmacies(@PathParam("session") String session, @PathParam("distance") String distance) {
 		LOG.entering(NAME, "getPharmacies");
 		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			if(distance.length() < 3) {
-				if(session.length() > 10 && session.length() < 250) {
+				if(session.length() == SESSION_LENGTH) {
 					Pharmacies pharmacies = new Pharmacies();
 					JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
 					
@@ -177,7 +185,6 @@ public class Rest {
 			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
 		}
 		
-		LOG.log(Level.INFO, "Couldn't find pharmacies!");
 		LOG.exiting(NAME, "getPharmacies");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
