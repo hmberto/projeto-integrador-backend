@@ -94,11 +94,11 @@ public class PharmaciesDB {
 				createPayload.object();
 				
 				double num = Double.parseDouble(f.getString(2));
-				String dist = String.format("%.2f", num);
+				String dist = String.format("%.1f", num);
 				
 				createPayload.key("name").value(f.getString(1));
 				createPayload.key("distance").value(dist + " km");
-				createPayload.key("fee").value("R$ " + CalcFeeDelivery.calcFeeDelivery(num));
+				createPayload.key("fee").value("R$ " + CalcFeeDelivery.calcFeeDelivery(num).replace(".", ","));
 				createPayload.key("time").value(CalcTimeDelivery.calcTimeDelivery(Math.round((num*100.0)/100.0)));
 				createPayload.key("imgpath").value(ReplaceImageNames.replaceNames(f.getString(1).toLowerCase()) + ".png");
 				
