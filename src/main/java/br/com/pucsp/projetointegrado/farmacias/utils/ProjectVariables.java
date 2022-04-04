@@ -14,9 +14,9 @@ public class ProjectVariables {
 		variables.put("MAX_PASS_LENGTH", "25");
 		
 		variables.put("DATABASE_DRIVER", "com.mysql.cj.jdbc.Driver");
-		variables.put("DATABASE_URL", "jdbc:mysql://54.237.70.33:3306/pharmacy");
-		variables.put("USERNAME", "pharmacy");
-		variables.put("PASSWORD", "123456789");
+		variables.put("DATABASE_URL", "jdbc:mysql://us-cdbr-east-05.cleardb.net:3306/heroku_5e7a54ea358097a");
+		variables.put("USERNAME", "b31218838506e5");
+		variables.put("PASSWORD", "4a5221e8");
 		variables.put("MAX_POOL", "250");
 		
 		variables.put("LOGIN_1", "SELECT * FROM " + TABLE_CLIENTS + " WHERE (email LIKE ?) AND (pass LIKE ?);");
@@ -29,8 +29,8 @@ public class ProjectVariables {
 		variables.put("REGEX_NUMBER", "[0-9]+");
 		variables.put("REGEX_CPF", "[0-9]{3}[.][0-9]{3}[.][0-9]{3}[-][0-9]{2}");
 		variables.put("REGEX_DATE", "[0-9]{4}[-|/][0-9]{2}[-|/][0-9]{2}");
-		variables.put("REGEX_EMAIL", "[0-9 a-z A-Z - .]+@[0-9 a-z A-Z - .]+");
-		variables.put("REGEX_PASS", "[0-9 a-z A-Z ! @ #]+");
+		variables.put("REGEX_EMAIL", "[0-9 a-z A-Z - _ .]+@[0-9 a-z A-Z - _ .]+");
+		variables.put("REGEX_PASS", "[0-9 a-z A-Z - _ . ! @ #]+");
 		
 		return variables;
 	}
