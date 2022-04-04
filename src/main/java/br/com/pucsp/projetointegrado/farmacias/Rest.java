@@ -19,13 +19,17 @@ import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
 
+import br.com.pucsp.projetointegrado.farmacias.client.ChangePassword;
 import br.com.pucsp.projetointegrado.farmacias.client.ConfirmEmail;
 import br.com.pucsp.projetointegrado.farmacias.client.LogIn;
 import br.com.pucsp.projetointegrado.farmacias.client.LogOut;
 import br.com.pucsp.projetointegrado.farmacias.client.Pharmacies;
+import br.com.pucsp.projetointegrado.farmacias.client.RecNewPassword;
 import br.com.pucsp.projetointegrado.farmacias.client.SignUp;
 import br.com.pucsp.projetointegrado.farmacias.client.login.GenerateLogin;
 import br.com.pucsp.projetointegrado.farmacias.client.login.LogInUser;
+import br.com.pucsp.projetointegrado.farmacias.client.password.ChangePass;
+import br.com.pucsp.projetointegrado.farmacias.client.password.NewPass;
 import br.com.pucsp.projetointegrado.farmacias.client.signup.CreateUsers;
 import br.com.pucsp.projetointegrado.farmacias.utils.GetIPAddress;
 import br.com.pucsp.projetointegrado.farmacias.utils.GetUserAgent;
@@ -186,6 +190,54 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "getPharmacies");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@POST
+	@Path("/client/new-password")
+	public Response recNewPassword(NewPass pass) {
+		LOG.entering(NAME, "recNewPassword");
+		
+		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+			RecNewPassword recNewPassword = new RecNewPassword();
+			boolean check = recNewPassword.changePass(variables, pass, SESSION_LENGTH);
+			
+			if(check) {
+				LOG.exiting(NAME, "recNewPassword");
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+		}
+		catch(Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't get new user password: " + e);
+		}
+		
+		LOG.log(Level.INFO, "Couldn't get new user password!");
+		LOG.exiting(NAME, "recNewPassword");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@POST
+	@Path("/client/change-password")
+	public Response changePassword(ChangePass pass) {
+		LOG.entering(NAME, "changePassword");
+		
+		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+			ChangePassword changePassword = new ChangePassword();
+			boolean check = changePassword.changePass(variables, pass, SESSION_LENGTH);
+			
+			if(check) {
+				LOG.exiting(NAME, "changePassword");
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+		}
+		catch(Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't change user password: " + e);
+		}
+		
+		LOG.log(Level.INFO, "Couldn't change user password!");
+		LOG.exiting(NAME, "changePassword");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
