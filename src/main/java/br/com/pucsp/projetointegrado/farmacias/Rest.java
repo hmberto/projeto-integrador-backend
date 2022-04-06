@@ -73,7 +73,6 @@ public class Rest {
 			else { check = false; }
 			
 			boolean passMatches = login.getPass().matches(variables.get("REGEX_PASS"));
-			// if(login.getPass().length() >= MIN_PASS_LENGTH && login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
 			if(login.getPass().length() >= MIN_PASS_LENGTH && login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
 			else { check = false; }
 			
@@ -106,9 +105,8 @@ public class Rest {
 		LOG.entering(NAME, "signupUsers");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			SignUp SignUp = new SignUp();
-			boolean check = SignUp.createUser(variables, user, SESSION_LENGTH);
+			boolean check = SignUp.createUser(variables, user);
 			
 			if(check) {
 				LOG.exiting(NAME, "signupUsers");
@@ -130,9 +128,8 @@ public class Rest {
 		LOG.entering(NAME, "logoutUsers");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			LogOut logoutUser = new LogOut();
-			boolean check = logoutUser.logout(variables, session, SESSION_LENGTH);
+			boolean check = logoutUser.logout(variables, session);
 			
 			if(check) {
 				LOG.exiting(NAME, "logoutUsers");
@@ -154,9 +151,8 @@ public class Rest {
 		LOG.entering(NAME, "confirmEmail");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			ConfirmEmail confirmEmail = new ConfirmEmail();
-			boolean check = confirmEmail.confirm(variables, token, email.toLowerCase(), SESSION_LENGTH);
+			boolean check = confirmEmail.confirm(variables, token, email.toLowerCase());
 			
 			if(check) {
 				LOG.exiting(NAME, "confirmEmail");
@@ -177,16 +173,11 @@ public class Rest {
 	public Response getPharmacies(@PathParam("session") String session, @PathParam("distance") String distance) {
 		LOG.entering(NAME, "getPharmacies");
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
-			if(distance.length() < 3) {
-				if(session.length() == SESSION_LENGTH) {
-					Pharmacies pharmacies = new Pharmacies();
-					JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
-					
-					LOG.exiting(NAME, "getPharmacies");
-					return Response.ok(payload.toString()).build();
-				}
-			}
+			Pharmacies pharmacies = new Pharmacies();
+			JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
+			
+			LOG.exiting(NAME, "getPharmacies");
+			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
 		}
@@ -201,9 +192,8 @@ public class Rest {
 		LOG.entering(NAME, "recNewPassword");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			RecNewPassword recNewPassword = new RecNewPassword();
-			boolean check = recNewPassword.changePass(variables, pass, SESSION_LENGTH);
+			boolean check = recNewPassword.changePass(variables, pass);
 			
 			if(check) {
 				LOG.exiting(NAME, "recNewPassword");
@@ -225,9 +215,8 @@ public class Rest {
 		LOG.entering(NAME, "changePassword");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			ChangePassword changePassword = new ChangePassword();
-			boolean check = changePassword.changePass(variables, pass, SESSION_LENGTH);
+			boolean check = changePassword.changePass(variables, pass);
 			
 			if(check) {
 				LOG.exiting(NAME, "changePassword");

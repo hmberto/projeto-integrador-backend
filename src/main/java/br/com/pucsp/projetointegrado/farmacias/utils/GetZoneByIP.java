@@ -16,6 +16,8 @@ public class GetZoneByIP {
 		LOG.entering(NAME, "getData");
 		String url = "https://ipapi.co/" + IP + "/json/";
 		
+		LOG.log(Level.INFO, "url user zone: " + url);
+		
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 			conn.setRequestMethod("POST");

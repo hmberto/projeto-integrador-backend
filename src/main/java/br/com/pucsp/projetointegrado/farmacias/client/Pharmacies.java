@@ -14,9 +14,16 @@ public class Pharmacies {
 	public JSONObject getPharmacies(Map <String, String> variables, String distance, String session) {
 		LOG.entering(NAME, "getPharmacies");
 		PharmaciesDB pharmaciesDB = new PharmaciesDB();
-		JSONObject payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, session).toString());
 		
-		LOG.exiting(NAME, "getPharmacies");
-		return payload;
+		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+		if(distance.length() < 3) {
+			if(session.length() == SESSION_LENGTH) {
+				JSONObject payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, session).toString());
+				
+				LOG.exiting(NAME, "getPharmacies");
+				return payload;
+			}
+		}
+		return null;
 	}
 }

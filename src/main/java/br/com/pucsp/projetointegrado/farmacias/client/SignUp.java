@@ -15,7 +15,7 @@ public class SignUp {
 	public static String NAME =  SignUp.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger( SignUp.class.getName());
 	
-	public boolean createUser(Map<String, String> variables, CreateUsers user, int SESSION_LENGTH) {
+	public boolean createUser(Map<String, String> variables, CreateUsers user) {
 		LOG.entering(NAME, "createUser");
 		CheckSignUp validate = new CheckSignUp();
 		boolean check = validate.checkData(variables, user);
@@ -37,7 +37,7 @@ public class SignUp {
 		    }
 			
 			SignUpDB createUser = new SignUpDB();
-			boolean create = createUser.CreateUserDB(variables, user, lat, lon, SESSION_LENGTH);
+			boolean create = createUser.CreateUserDB(variables, user, lat, lon);
 			
 			if(create) {
 				LOG.exiting(NAME, "createUser");

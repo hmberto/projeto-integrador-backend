@@ -11,8 +11,10 @@ public class ChangePassword {
 	public static String NAME =  ChangePassword.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger( ChangePassword.class.getName());
 	
-	public boolean changePass(Map<String, String> variables, ChangePass pass, int SESSION_LENGTH) {
+	public boolean changePass(Map<String, String> variables, ChangePass pass) {
 		LOG.entering(NAME, "changePass");
+		
+		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 		
 		if(pass.getToken().length() == SESSION_LENGTH) {
 			boolean checkEmail = pass.getEmail().toLowerCase().matches(variables.get("REGEX_EMAIL"));

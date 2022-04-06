@@ -1,5 +1,6 @@
 package br.com.pucsp.projetointegrado.farmacias.client;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -12,8 +13,12 @@ public class LogIn {
 	public Map<Integer, String> authenticateUser(String userAgent, Map<String, String> variables, String user, String pass, String IP, String newLogin) {
 		LOG.entering(NAME, "authenticateUser");
 		
+		Map<Integer, String> session = new HashMap<Integer, String>();
+		
 		LoginDB loginDB = new LoginDB();				
-		Map<Integer, String> session = loginDB.LoginUser(userAgent, variables, user, pass, newLogin, IP);
+		String userSession = loginDB.LoginUser(userAgent, variables, user, pass, newLogin, IP);
+		
+		session.put(1, userSession);
 		
 		LOG.exiting(NAME, "authenticateUser");
 		return session;

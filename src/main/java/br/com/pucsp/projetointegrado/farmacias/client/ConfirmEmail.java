@@ -9,8 +9,11 @@ public class ConfirmEmail {
 	public static String NAME = ConfirmEmail.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(ConfirmEmail.class.getName());
 	
-	public boolean confirm(Map <String, String> variables, String token, String email, int SESSION_LENGTH) {
+	public boolean confirm(Map <String, String> variables, String token, String email) {
 		LOG.entering(NAME, "confirm");
+		
+		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+		
 		ConfirmEmailDB confirmEmail = new ConfirmEmailDB();
 		
 		boolean emailMatches = email.matches(variables.get("REGEX_EMAIL"));
