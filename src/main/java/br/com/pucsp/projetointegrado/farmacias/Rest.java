@@ -26,11 +26,13 @@ import br.com.pucsp.projetointegrado.farmacias.client.LogOut;
 import br.com.pucsp.projetointegrado.farmacias.client.Pharmacies;
 import br.com.pucsp.projetointegrado.farmacias.client.RecNewPassword;
 import br.com.pucsp.projetointegrado.farmacias.client.SignUp;
+import br.com.pucsp.projetointegrado.farmacias.client.Update;
 import br.com.pucsp.projetointegrado.farmacias.client.login.GenerateLogin;
 import br.com.pucsp.projetointegrado.farmacias.client.login.LogInUser;
 import br.com.pucsp.projetointegrado.farmacias.client.password.ChangePass;
 import br.com.pucsp.projetointegrado.farmacias.client.password.NewPass;
 import br.com.pucsp.projetointegrado.farmacias.client.signup.CreateUsers;
+import br.com.pucsp.projetointegrado.farmacias.client.updateusers.UpdateUsers;
 import br.com.pucsp.projetointegrado.farmacias.utils.GetIPAddress;
 import br.com.pucsp.projetointegrado.farmacias.utils.GetUserAgent;
 import br.com.pucsp.projetointegrado.farmacias.utils.ProjectVariables;
@@ -238,6 +240,30 @@ public class Rest {
 		
 		LOG.log(Level.INFO, "Couldn't change user password!");
 		LOG.exiting(NAME, "changePassword");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@POST
+	@Path("/client/update")
+	public Response updateUsers(UpdateUsers user) {
+		LOG.entering(NAME, "updateUsers");
+		
+		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+			Update update = new Update();
+			boolean check = update.updateUsers(variables, user, SESSION_LENGTH);
+			
+			if(check) {
+				LOG.exiting(NAME, "updateUsers");
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+		}
+		catch(Exception e) {
+			LOG.log(Level.SEVERE, "User not updated: " + e);
+		}
+		
+		LOG.log(Level.INFO, "Couldn't update user!");
+		LOG.exiting(NAME, "updateUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
