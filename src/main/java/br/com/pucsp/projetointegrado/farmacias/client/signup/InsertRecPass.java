@@ -45,11 +45,13 @@ public class InsertRecPass {
 			
 			getIdRecPassStat.close();
 			
-			String removeToken = "UPDATE Rec_Senha SET id_rec_senha = ? WHERE (id_rec_senha LIKE ?);";
+			String removeToken = "UPDATE Rec_Senha SET token_rec_senha = ? WHERE (id_rec_senha LIKE ?) AND (token_rec_senha LIKE ?);";
 			PreparedStatement statementRemoveToken = DB.connect(variables).prepareStatement(removeToken);
 			statementRemoveToken.setString(1, "NULL");
-			statementRemoveToken.setString(2, emailSession);
+			statementRemoveToken.setString(2, idRecPassGetted);
+			statementRemoveToken.setString(3, emailSession);
 			
+			statementRemoveToken.execute();
 			statementRemoveToken.close();
 			
 			LOG.log(Level.INFO, "User rec pass created at rec pass table! RecPass ID: " + idRecPassGetted);

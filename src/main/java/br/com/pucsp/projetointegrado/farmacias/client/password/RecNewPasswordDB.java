@@ -61,7 +61,7 @@ public class RecNewPasswordDB {
 			
 			LOG.log(Level.INFO, "Rec_Senha ID getted from Rec_Senha table! Rec_Senha ID: " + idRecPassGetted);
 			
-			String updatePass = "UPDATE Rec_Senha SET data_rec = ? AND token_rec_senha = ? WHERE (id_rec_senha LIKE ?);";
+			String updatePass = "UPDATE Rec_Senha SET data_rec = ?, token_rec_senha = ? WHERE (id_rec_senha LIKE ?);";
 			
 			PreparedStatement updateRecPassStat = DB.connect(variables).prepareStatement(updatePass);
 			updateRecPassStat.setString(1, time);
