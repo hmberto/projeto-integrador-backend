@@ -46,7 +46,7 @@ public class EmailConfirmation {
 			
 			message.setRecipients(Message.RecipientType.TO, toUser);
 			message.setSubject(messageSubject);
-			message.setContent(messageSend, "text/html");
+			message.setContent(messageSend, "text/html; charset=UTF-8");
 			
 			Transport.send(message);
 			LOG.log(Level.INFO, "Email sent to " + destinatário);

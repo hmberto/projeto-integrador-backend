@@ -19,11 +19,13 @@ import javax.ws.rs.core.Response;
 
 import br.com.pucsp.projetointegrador.user.ChangePassword;
 import br.com.pucsp.projetointegrador.user.ConfirmEmail;
+import br.com.pucsp.projetointegrador.user.GetUser;
 import br.com.pucsp.projetointegrador.user.LogIn;
 import br.com.pucsp.projetointegrador.user.LogOut;
 import br.com.pucsp.projetointegrador.user.RecNewPassword;
 import br.com.pucsp.projetointegrador.user.SignUp;
 import br.com.pucsp.projetointegrador.user.Update;
+import br.com.pucsp.projetointegrador.user.getuser.GenerateUser;
 import br.com.pucsp.projetointegrador.user.login.GenerateLogin;
 import br.com.pucsp.projetointegrador.user.login.LogInUser;
 import br.com.pucsp.projetointegrador.user.password.ChangePass;
@@ -208,6 +210,31 @@ public class Rest {
 		
 		LOG.log(Level.INFO, "Couldn't change user password!");
 		LOG.exiting(NAME, "changePassword");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/user/get-user/{sessionId}")
+	public Response getUser(@PathParam("sessionId") String sessionId) {
+		LOG.entering(NAME, "getUser");
+		
+		try {
+			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+			if(sessionId.length() == SESSION_LENGTH) {
+				GetUser getUser = new GetUser();
+				Map<String, String> user = getUser.user(variables, sessionId);
+				
+				if(user.get("email").length() >= 10) {
+					LOG.exiting(NAME, "getUser");
+					return Response.ok(new GenerateUser(user)).build();
+				}
+			}
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "User not confirmed: " + e);
+		}
+		
+		LOG.log(Level.INFO, "Couldn't confirm user!");
+		LOG.exiting(NAME, "confirmEmail");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	

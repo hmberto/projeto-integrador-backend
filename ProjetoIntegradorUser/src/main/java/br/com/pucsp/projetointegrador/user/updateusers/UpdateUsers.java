@@ -10,18 +10,6 @@ public class UpdateUsers {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getPass() {
-		return pass;
-	}
-	public void setPass(String pass) {
-		this.pass = pass;
-	}
 	public String getStreet() {
 		return street;
 	}
@@ -64,18 +52,6 @@ public class UpdateUsers {
 	public void setDistrict(String district) {
 		this.district = district;
 	}
-	public String getCpf() {
-		return cpf;
-	}
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
-	public String getBirthDate() {
-		return birthDate;
-	}
-	public void setBirthDate(String birthDate) {
-		this.birthDate = birthDate;
-	}
 	public String getSex() {
 		return sex;
 	}
@@ -84,8 +60,6 @@ public class UpdateUsers {
 	}
 	
 	String name;
-	String email;
-	String pass;
 	String street;
 	String number;
 	String complement;
@@ -93,8 +67,6 @@ public class UpdateUsers {
 	String state;
 	String city;
 	String district;
-	String cpf;
-	String birthDate;
 	String sex;
 	
 	public UpdateUsers() {}
