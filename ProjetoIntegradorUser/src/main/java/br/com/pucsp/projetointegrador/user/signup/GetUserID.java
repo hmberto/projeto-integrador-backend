@@ -12,15 +12,14 @@ public class GetUserID {
 	public static String NAME = GetUserID.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(GetUserID.class.getName());
 	
-	public static String getUserID(Map<String, String> variables, String email, String cpf) {
+	public static String getUserID(Map<String, String> variables, String email) {
 		LOG.entering(NAME, "getUserID");
 		
 		try {
-			String getIdUser = "SELECT id_usuario FROM Usuario WHERE (email LIKE ?) AND (cpf LIKE ?);";
+			String getIdUser = "SELECT id_usuario FROM Usuario WHERE (email LIKE ?);";
 			
 			PreparedStatement getIdUserStat = DB.connect(variables).prepareStatement(getIdUser);
 			getIdUserStat.setString(1, email);
-			getIdUserStat.setString(2, cpf);
 			
 			String idUserGetted = "";
 			

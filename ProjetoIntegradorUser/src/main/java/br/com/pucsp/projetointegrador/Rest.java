@@ -244,9 +244,8 @@ public class Rest {
 		LOG.entering(NAME, "updateUsers");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 			Update update = new Update();
-			boolean check = update.updateUsers(variables, user, SESSION_LENGTH);
+			boolean check = update.updateUsers(variables, user);
 			
 			if(check) {
 				LOG.exiting(NAME, "updateUsers");

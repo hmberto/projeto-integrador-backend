@@ -40,7 +40,7 @@ public class SignUpDB {
 			statement.execute();
 			statement.close();
 			
-			String userId = GetUserID.getUserID(variables, user.getEmail().toLowerCase(), user.getCpf());
+			String userId = GetUserID.getUserID(variables, user.getEmail().toLowerCase());
 			String passId = InsertPass.insertPass(variables, user.getPass(), userId, emailSession);
 			
 			String sqlPass = "INSERT INTO Login_Sessao (id_session, id_usuario, id_senha) values (?, ?, ?);";
@@ -69,7 +69,7 @@ public class SignUpDB {
 			String shortText = welcome + nomeSeparado[0] + "! Confirme que este é seu endereço de e-mail.";
 			String info = "Clique no link abaixo para confirmar seu e-mail e liberar o acesso ao site.<br><br>Se você não é " + user.getName() + ", desconsidere este e-mail.";
 			String btnText = "Confirmar e-mail";
-			String btnLink = "https://pharmacy-delivery.herokuapp.com/client/confirm-email/" + user.getEmail().toLowerCase() + "/" + emailSession;
+			String btnLink = "https://projeto-integrador-user.herokuapp.com/user/confirm-email/" + user.getEmail().toLowerCase() + "/" + emailSession;
 			String messageText = EmailTemplate.template(messageSubject, info, shortText, btnText, btnLink);
 			
 			EmailConfirmation sendEmail = new EmailConfirmation();

@@ -14,9 +14,9 @@ public class ProjectVariables {
 		variables.put("MAX_PASS_LENGTH", "25");
 		
 		variables.put("DATABASE_DRIVER", "com.mysql.cj.jdbc.Driver");
-		variables.put("DATABASE_URL", "jdbc:mysql://us-cdbr-east-05.cleardb.net:3306/heroku_5e7a54ea358097a");
-		variables.put("USERNAME", "b31218838506e5");
-		variables.put("PASSWORD", "4a5221e8");
+		variables.put("DATABASE_URL", "jdbc:mysql://us-cdbr-east-05.cleardb.net:3306/heroku_0d799454f58033e");
+		variables.put("USERNAME", "b030978eac4cfc");
+		variables.put("PASSWORD", "d77b3302");
 		variables.put("MAX_POOL", "250");
 		
 		variables.put("LOGIN_1", "SELECT * FROM " + TABLE_CLIENTS + " WHERE (email LIKE ?) AND (pass LIKE ?);");

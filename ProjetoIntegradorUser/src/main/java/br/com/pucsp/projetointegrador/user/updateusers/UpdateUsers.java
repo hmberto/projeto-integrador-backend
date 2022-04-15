@@ -4,6 +4,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "CreateUsers")
 public class UpdateUsers {
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	public String getName() {
 		return name;
 	}
@@ -59,6 +65,7 @@ public class UpdateUsers {
 		this.sex = sex;
 	}
 	
+	String email;
 	String name;
 	String street;
 	String number;
