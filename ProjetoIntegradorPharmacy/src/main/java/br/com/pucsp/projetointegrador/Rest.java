@@ -16,6 +16,8 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.pharmacy.Pharmacies;
+import br.com.pucsp.projetointegrador.pharmacy.PharmaciesAnon;
+import br.com.pucsp.projetointegrador.pharmacy.PharmaciesAnonStreet;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ProjectVariables;
 
 @Produces("application/json")
@@ -54,6 +56,42 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "getPharmacies");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/pharmacy/home/{distance}/{lat}/{lon}")
+	public Response getPharmaciesAnon(@PathParam("lat") String lat, @PathParam("lon") String lon, @PathParam("distance") String distance) {
+		LOG.entering(NAME, "getPharmaciesAnon");
+		try {
+			PharmaciesAnon pharmacies = new PharmaciesAnon();
+			JSONObject payload = pharmacies.getPharmacies(variables, distance, lat, lon);
+			
+			LOG.exiting(NAME, "getPharmacies");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
+		}
+		
+		LOG.exiting(NAME, "getPharmaciesAnon");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/pharmacy/home/{distance}/{street}/{district}/{state}/{city}")
+	public Response getPharmaciesAnonStreet(@PathParam("street") String street, @PathParam("district") String district, @PathParam("state") String state, @PathParam("city") String city, @PathParam("distance") String distance) {
+		LOG.entering(NAME, "getPharmaciesAnon");
+		try {
+			PharmaciesAnonStreet pharmacies = new PharmaciesAnonStreet();
+			JSONObject payload = pharmacies.getPharmacies(variables, distance, street, district, state, city);
+			
+			LOG.exiting(NAME, "getPharmacies");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
+		}
+		
+		LOG.exiting(NAME, "getPharmaciesAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
