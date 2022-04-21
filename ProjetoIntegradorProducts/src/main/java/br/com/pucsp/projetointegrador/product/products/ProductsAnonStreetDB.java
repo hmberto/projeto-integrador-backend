@@ -6,63 +6,22 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.product.db.DB;
-import br.com.pucsp.projetointegrador.product.db.GetFromDB;
 
-public class ProductsDB {
-	public static String NAME = ProductsDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(ProductsDB.class.getName());
+public class ProductsAnonStreetDB {
+	public static String NAME = ProductsAnonStreetDB.class.getSimpleName();
+	private static Logger LOG = Logger.getLogger(ProductsAnonStreetDB.class.getName());
 	
-	public StringBuffer getProducts(Map <String, String> variables, String distance, String session) {
+	public StringBuffer getProducts(Map <String, String> variables, String distance, String street, String district, String state, String city) {
 		LOG.entering(NAME, "getProducts");
-		
-		GetFromDB getFromDB = new GetFromDB();
 		
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		try {
-//			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_session LIKE ?);";
-//			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
-//			statement1.setString(1, session);
-//			
-//			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statement1);
-//			statement1.close();
-//			
-//			String sql2 = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
-//			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
-//			statement2.setString(1, getLoginSession.get("id_usuario"));
-//			
-//			Map<String, String> getUser = getFromDB.getFromDB(variables, statement2);
-//			statement2.close();
-//			
-//			String sql3 = "SELECT lat, lon FROM Endereco WHERE (id_endereco LIKE ?);";
-//			PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
-//			statement3.setString(1, getUser.get("id_endereco"));
-//			
-//			Map<String, String> getAddress = getFromDB.getFromDB(variables, statement3);
-//			statement3.close();
-//			
-//			String sql = "SELECT Farmacia.nome, (6371 *\n"
-//					+ "        acos(\n"
-//					+ "            cos(radians(" + getAddress.get("lat") + ")) *\n"
-//					+ "            cos(radians(lat)) *\n"
-//					+ "            cos(radians(" + getAddress.get("lon") + ") - radians(lon)) +\n"
-//					+ "            sin(radians(" + getAddress.get("lat") + ")) *\n"
-//					+ "            sin(radians(lat))\n"
-//					+ "        )) AS distance\n"
-//					+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
-//			
-//			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
-//			
-//			ResultSet f = statement.executeQuery();
-//			
-//			LOG.log(Level.INFO, "Nearby pharmacies products getted from DB");
-			
 			createPayload.object();
 			
 			List<String> pharmacies = new ArrayList<String>();
