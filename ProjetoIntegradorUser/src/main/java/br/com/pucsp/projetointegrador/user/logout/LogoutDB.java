@@ -17,7 +17,7 @@ public class LogoutDB {
 	public boolean LogoutUser(Map <String, String> variables, String sessionId) {
 		LOG.entering(NAME, "LogoutUser");
 		
-		String sql = "UPDATE Login_Sessao SET id_session = ? WHERE (id_session LIKE ?);";
+		String sql = "UPDATE Login_Sessao SET id_sessao = ? WHERE (id_sessao LIKE ?);";
 		
 		try {
 			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);

@@ -43,7 +43,7 @@ public class SignUpDB {
 			String userId = GetUserID.getUserID(variables, user.getEmail().toLowerCase());
 			String passId = InsertPass.insertPass(variables, user.getPass(), userId, emailSession);
 			
-			String sqlPass = "INSERT INTO Login_Sessao (id_session, id_usuario, id_senha) values (?, ?, ?);";
+			String sqlPass = "INSERT INTO Login_Sessao (id_sessao, id_usuario, id_senha) values (?, ?, ?);";
 			PreparedStatement statementSession = DB.connect(variables).prepareStatement(sqlPass);
 			statementSession.setString(1, "NULL");
 			statementSession.setString(2, userId);

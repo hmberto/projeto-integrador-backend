@@ -26,7 +26,7 @@ public class ProductsDB {
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		try {
-//			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_session LIKE ?);";
+//			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
 //			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
 //			statement1.setString(1, session);
 //			

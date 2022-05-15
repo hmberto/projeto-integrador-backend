@@ -55,7 +55,7 @@ public class LoginDB {
 			if(getPass.get("senha").equals(pass)) {
 				LOG.log(Level.INFO, "Data geted from the database. Email: " + email);
 				
-				String sql4 = "UPDATE Login_Sessao SET id_session = ? WHERE (id_usuario LIKE ?) AND (id_senha LIKE ?);";
+				String sql4 = "UPDATE Login_Sessao SET id_sessao = ? WHERE (id_usuario LIKE ?) AND (id_senha LIKE ?);";
 				PreparedStatement statement4 = DB.connect(variables).prepareStatement(sql4);
 				statement4.setString(1, userSession);
 				statement4.setString(2, getUser.get("id_usuario"));

@@ -1,5 +1,6 @@
 package br.com.pucsp.projetointegrador.pharmacy.mail;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +14,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import br.com.pucsp.projetointegrador.pharmacy.utils.ProjectVariables;
+
 public class EmailConfirmation {
 	public static String NAME = EmailConfirmation.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(EmailConfirmation.class.getName());
@@ -21,6 +24,9 @@ public class EmailConfirmation {
 		LOG.entering(NAME, "confirmation");
 		
 		LOG.log(Level.INFO, "Sending email to " + destinatário);
+		
+		ProjectVariables projectVariables = new ProjectVariables();
+		final Map <String, String> variables = projectVariables.projectVariables();
 		
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com");
@@ -31,7 +37,7 @@ public class EmailConfirmation {
 		
 		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("entregadefarmacias@gmail.com", "Puc@2022");
+				return new PasswordAuthentication(variables.get("EMAIL_PROJETO"), variables.get("SENHA_EMAIL_PROJETO"));
 			}
 		});
 

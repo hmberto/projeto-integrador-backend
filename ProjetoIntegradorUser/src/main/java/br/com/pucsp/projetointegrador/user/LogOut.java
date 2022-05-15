@@ -36,7 +36,7 @@ public class LogOut {
 				
 				Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statement2);
 				
-				boolean check = userFromDb.LogoutUser(variables, getLoginSession.get("id_session"));
+				boolean check = userFromDb.LogoutUser(variables, getLoginSession.get("id_sessao"));
 				
 				if(check) { 
 					LOG.exiting(NAME, "logout");

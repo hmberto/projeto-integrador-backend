@@ -14,10 +14,13 @@ public class ProjectVariables {
 		variables.put("MAX_PASS_LENGTH", "25");
 		
 		variables.put("DATABASE_DRIVER", "com.mysql.cj.jdbc.Driver");
-		variables.put("DATABASE_URL", "jdbc:mysql://us-cdbr-east-05.cleardb.net:3306/heroku_0d799454f58033e");
-		variables.put("USERNAME", "b030978eac4cfc");
-		variables.put("PASSWORD", "d77b3302");
+		variables.put("DATABASE_URL", System.getenv("DATABASE_URL"));
+		variables.put("USERNAME", System.getenv("USERNAME"));
+		variables.put("PASSWORD", System.getenv("PASSWORD"));
 		variables.put("MAX_POOL", "250");
+		
+		variables.put("EMAIL_PROJETO", System.getenv("EMAIL_PROJETO"));
+		variables.put("SENHA_EMAIL_PROJETO", System.getenv("SENHA_EMAIL_PROJETO"));
 		
 		variables.put("LOGIN_1", "SELECT * FROM " + TABLE_CLIENTS + " WHERE (email LIKE ?) AND (pass LIKE ?);");
 		variables.put("LOGIN_2", "UPDATE " + TABLE_CLIENTS + " SET session_id = ? WHERE (email LIKE ?);");

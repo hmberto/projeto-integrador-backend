@@ -23,7 +23,7 @@ public class GetUserDB {
 		Map<String, String> user = new HashMap<String, String>();
 		
 		try {
-			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_session LIKE ?);";
+			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
 			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
 			statement1.setString(1, sessionId);
 			
