@@ -53,16 +53,6 @@ CREATE TABLE `Status` (
 	PRIMARY KEY (`id_status`)
 )
 
-CREATE TABLE `Emp_Entrega` (
-	`id_emp_entrega` int AUTO_INCREMENT,
-	`nome` varchar(50) NOT NULL,
-	`cnpj` varchar(18) NOT null,
-	`ativo` boolean NOT NULL,
-	`id_endereco` int,
-	PRIMARY KEY (`id_emp_entrega`),
-	FOREIGN KEY (`id_endereco`) REFERENCES `Endereco` (`id_endereco`)
-)
-
 CREATE TABLE `Endereco` (
 	`id_endereco` int AUTO_INCREMENT,
 	`nome` varchar(50) NOT NULL,
@@ -84,6 +74,7 @@ CREATE TABLE `Endereco` (
 
 CREATE TABLE `Entrega` (
 	`id_entrega` int AUTO_INCREMENT,
+	`valor_entrega` float NOT NULL,
 	`data_entrega` date NOT NULL,
 	`hora_entrega` time NOT NULL,
 	`id_entregador` int,
@@ -95,10 +86,10 @@ CREATE TABLE `Entregador` (
 	`id_entregador` int AUTO_INCREMENT,
 	`nome` varchar(50) NOT NULL,
 	`cpf` varchar(11) NOT NULL,
+	`cnh` varchar(25) NOT NULL,
+	`categoria_cnh` varchar(25) NOT NULL,
 	`ativo` boolean NOT NULL,
-	`id_emp_entrega` int,
-	PRIMARY KEY (`id_entregador`),
-	FOREIGN KEY (`id_emp_entrega`) REFERENCES `Emp_Entrega` (`id_emp_entrega`)
+	PRIMARY KEY (`id_entregador`)
 )
 
 CREATE TABLE `Estado` (
@@ -150,17 +141,16 @@ CREATE TABLE `Categoria` (
 
 CREATE TABLE `Sub_Categoria` (
 	`id_subcategoria` int AUTO_INCREMENT,
-	`nome` varchar(50) UNIQUE NOT NULL,
+	`nome` varchar(50) NOT NULL,
 	`ativo` boolean NOT NULL,
 	PRIMARY KEY (`id_subcategoria`)
 )
 
 CREATE TABLE `Compra_Itens` (
-	`id_compra_itens` int AUTO_INCREMENT,
 	`quantidade` int NOT NULL,
+	`valor_total_compra_itens` float NOT NULL,
 	`id_produto_farmacia` int,
 	`id_compra` int,
-	PRIMARY KEY (`id_compra_itens`),
 	FOREIGN KEY (`id_produto_farmacia`) REFERENCES `Produto_Farmacia` (`id_produto_farmacia`),
 	FOREIGN KEY (`id_compra`) REFERENCES `Compra` (`id_compra`)
 )
