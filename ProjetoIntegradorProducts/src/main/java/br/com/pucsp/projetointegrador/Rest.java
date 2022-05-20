@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import br.com.pucsp.projetointegrador.product.Products;
 import br.com.pucsp.projetointegrador.product.ProductsAnon;
 import br.com.pucsp.projetointegrador.product.ProductsAnonStreet;
+import br.com.pucsp.projetointegrador.product.SearchProducts;
 import br.com.pucsp.projetointegrador.product.utils.ProjectVariables;
 
 @Produces("application/json")
@@ -92,6 +93,24 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "getProductsAnonStreet");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/product/search/{distance}/{session}/{productName}")
+	public Response getProductsSearch(@PathParam("session") String session, @PathParam("distance") String distance, @PathParam("productName") String productName) {
+		LOG.entering(NAME, "getProductsSearch");
+		try {
+			SearchProducts searchProducts = new SearchProducts();
+			JSONObject payload = searchProducts.getProducts(variables, distance, session, productName);
+			
+			LOG.exiting(NAME, "getProductsSearch");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+		}
+		
+		LOG.exiting(NAME, "getProductsSearch");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
