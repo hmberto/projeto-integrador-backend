@@ -1,11 +1,5 @@
-ProjetoIntegradorUser/system.properties
-ProjetoIntegradorUser/target/
-ProjetoIntegradorUser/.classpath
-ProjetoIntegradorUser/.project
-ProjetoIntegradorUser/.settings
-
-ProjetoIntegradorPharmacy/system.properties
-ProjetoIntegradorPharmacy/target/
-ProjetoIntegradorPharmacy/.classpath
-ProjetoIntegradorPharmacy/.project
-ProjetoIntegradorPharmacy/.settings
+*/system.properties
+*/target/
+*/.classpath
+*/.project
+*/.settings
