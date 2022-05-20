@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
@@ -29,12 +28,33 @@ public class SearchProductsDB {
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		try {
+			String sqlA = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
+			PreparedStatement statementA = DB.connect(variables).prepareStatement(sqlA);
+			statementA.setString(1, session);
+			
+			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statementA);
+			statementA.close();
+			
+			String sqlB = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
+			PreparedStatement statementB = DB.connect(variables).prepareStatement(sqlB);
+			statementB.setString(1, getLoginSession.get("id_usuario"));
+			
+			Map<String, String> getUser = getFromDB.getFromDB(variables, statementB);
+			statementB.close();
+			
+			String sqlC = "SELECT lat, lon FROM Endereco WHERE (id_endereco LIKE ?);";
+			PreparedStatement statementC = DB.connect(variables).prepareStatement(sqlC);
+			statementC.setString(1, getUser.get("id_endereco"));
+			
+			Map<String, String> getAddress = getFromDB.getFromDB(variables, statementC);
+			statementC.close();
+			
 			String sql1 = "SELECT Farmacia.id_farmacia, (6371 *\n"
 					+ "        acos(\n"
-					+ "            cos(radians(" + "-23.57065355" + ")) *\n"
+					+ "            cos(radians(" + getAddress.get("lat") + ")) *\n"
 					+ "            cos(radians(lat)) *\n"
-					+ "            cos(radians(" + "-46.64569329160657" + ") - radians(lon)) +\n"
-					+ "            sin(radians(" + "-23.57065355" + ")) *\n"
+					+ "            cos(radians(" + getAddress.get("lon") + ") - radians(lon)) +\n"
+					+ "            sin(radians(" + getAddress.get("lat") + ")) *\n"
 					+ "            sin(radians(lat))\n"
 					+ "        )) AS distance\n"
 					+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
@@ -94,7 +114,6 @@ public class SearchProductsDB {
 			ResultSet f4 = statement4.executeQuery();
 			
 			List<String> pharmaciesIds = new ArrayList<String>();
-			Map<Integer, String> price = new HashMap<Integer, String>();
 			Map<Integer, Integer> ProductsPharmacies = new HashMap<Integer, Integer>();
 			
 			Map<Integer, String> finalProducts = new HashMap<Integer, String>();
@@ -116,8 +135,6 @@ public class SearchProductsDB {
 			stringfyPharmaciesIds.append(pharmaciesIds.toString().replace("[", "").replace("]", ""));
 			stringfyPharmaciesIds.toString();
 			
-			createPayload.object();
-			
 			String sql5 = "select id_farmacia,nome from Farmacia where id_farmacia in (" + stringfyPharmaciesIds + ");";
 			PreparedStatement statement5 = DB.connect(variables).prepareStatement(sql5);
 			ResultSet f5 = statement5.executeQuery();
@@ -134,6 +151,8 @@ public class SearchProductsDB {
 				products.add(tmpProduct);
 				pharmacies.add(f5.getString(2));
 			}
+			
+			createPayload.object();
 			
 //			int i = 0;
 //			while(f.next()) {

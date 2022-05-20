@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.product.products.SearchProductsAnonDB;
-import br.com.pucsp.projetointegrador.product.products.SearchProductsDB;
 
 public class SearchProductsAnon {
 	public static String NAME = SearchProductsAnon.class.getSimpleName();

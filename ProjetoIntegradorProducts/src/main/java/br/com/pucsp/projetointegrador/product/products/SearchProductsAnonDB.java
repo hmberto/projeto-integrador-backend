@@ -9,12 +9,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.product.db.DB;
-import br.com.pucsp.projetointegrador.product.db.GetFromDB;
 
 public class SearchProductsAnonDB {
 	public static String NAME = SearchProductsAnonDB.class.getSimpleName();
@@ -22,9 +20,7 @@ public class SearchProductsAnonDB {
 	
 	public StringBuffer getProducts(Map <String, String> variables, String distance, String lat, String lon, String productName) {
 		LOG.entering(NAME, "getProducts");
-		
-		GetFromDB getFromDB = new GetFromDB();
-		
+				
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
@@ -94,7 +90,6 @@ public class SearchProductsAnonDB {
 			ResultSet f4 = statement4.executeQuery();
 			
 			List<String> pharmaciesIds = new ArrayList<String>();
-			Map<Integer, String> price = new HashMap<Integer, String>();
 			Map<Integer, Integer> ProductsPharmacies = new HashMap<Integer, Integer>();
 			
 			Map<Integer, String> finalProducts = new HashMap<Integer, String>();
@@ -116,8 +111,6 @@ public class SearchProductsAnonDB {
 			stringfyPharmaciesIds.append(pharmaciesIds.toString().replace("[", "").replace("]", ""));
 			stringfyPharmaciesIds.toString();
 			
-			createPayload.object();
-			
 			String sql5 = "select id_farmacia,nome from Farmacia where id_farmacia in (" + stringfyPharmaciesIds + ");";
 			PreparedStatement statement5 = DB.connect(variables).prepareStatement(sql5);
 			ResultSet f5 = statement5.executeQuery();
@@ -134,6 +127,8 @@ public class SearchProductsAnonDB {
 				products.add(tmpProduct);
 				pharmacies.add(f5.getString(2));
 			}
+			
+			createPayload.object();
 			
 //			int i = 0;
 //			while(f.next()) {

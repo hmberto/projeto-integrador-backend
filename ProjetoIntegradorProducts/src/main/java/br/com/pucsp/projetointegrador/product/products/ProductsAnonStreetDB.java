@@ -1,15 +1,20 @@
 package br.com.pucsp.projetointegrador.product.products;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.product.db.DB;
+import br.com.pucsp.projetointegrador.product.utils.GetUserCoordinates;
 
 public class ProductsAnonStreetDB {
 	public static String NAME = ProductsAnonStreetDB.class.getSimpleName();
@@ -21,55 +26,126 @@ public class ProductsAnonStreetDB {
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
+		String lat = "";
+		String lon = "";
+		
+		GetUserCoordinates getUserCoordinates = new GetUserCoordinates();
+		
 		try {
-			createPayload.object();
+			String coordinates = getUserCoordinates.coordinates(street, "1");
+			JSONArray jsonarray = new JSONArray(coordinates);
 			
-			List<String> pharmacies = new ArrayList<String>();
-			pharmacies.add("Drogaria São Paulo");
-			pharmacies.add("Ultrafarma");
-			pharmacies.add("Pague Menos");
-			pharmacies.add("Droga Raia");
+			for(int i=0; i<jsonarray.length(); i++){
+		        JSONObject obj = jsonarray.getJSONObject(i);
+
+		        lat = obj.getString("lat");
+		        lon = obj.getString("lon");
+			}
+			
+			String sql1 = "SELECT Farmacia.id_farmacia, (6371 *\n"
+					+ "        acos(\n"
+					+ "            cos(radians(" + lat + ")) *\n"
+					+ "            cos(radians(lat)) *\n"
+					+ "            cos(radians(" + lon + ") - radians(lon)) +\n"
+					+ "            sin(radians(" + lat + ")) *\n"
+					+ "            sin(radians(lat))\n"
+					+ "        )) AS distance\n"
+					+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
+			
+			PreparedStatement statement = DB.connect(variables).prepareStatement(sql1);
+			ResultSet f = statement.executeQuery();
+			
+			List<String> pharmaciesId = new ArrayList<String>(); 
+			
+			while(f.next()) {
+				pharmaciesId.add(f.getString(1));
+			}
+			
+			StringBuffer stringfy = new StringBuffer();
+			
+			stringfy.append(pharmaciesId.toString().replace("[", "").replace("]", ""));
+			stringfy.toString();
+			
+			String sql2 = "select id_produto from Produto_Farmacia where id_farmacia in (" + stringfy + ");";
+			
+			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
+			ResultSet f2 = statement2.executeQuery();
+			
+			List<String> productsId = new ArrayList<String>();
+			
+			while(f2.next()) {
+				productsId.add(f2.getString(1));
+			}
+			
+			StringBuffer stringfyProducts = new StringBuffer();
+			
+			stringfyProducts.append(productsId.toString().replace("[", "").replace("]", ""));
+			stringfyProducts.toString();
+			
+			String sql3 = "SELECT * FROM produto WHERE id_produto in (" + stringfyProducts + ");";
+			
+			PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
+			ResultSet f3 = statement3.executeQuery();
+			
+			List<String> productsSearchIds = new ArrayList<String>();
+			Map<Integer, String> productsSearch = new HashMap<Integer, String>();
+			
+			while(f3.next()) {
+				int productId = Integer.parseInt(f3.getString(1));
+				productsSearch.put(productId ,"{ id: '" + f3.getString(1) + "', amount: '" + f3.getString(5) + "', name: '" + f3.getString(2) + "', pharmacy: 'PHARMACY_NAME', price: 'R$ PRICE_FLOAT', image: '" + f3.getString(6) + "', description: '" + f3.getString(7) + "' }");
+				productsSearchIds.add(f3.getString(1));
+			}
+			
+			StringBuffer productsSearchId = new StringBuffer();
+			
+			productsSearchId.append(productsSearchIds.toString().replace("[", "").replace("]", ""));
+			productsSearchId.toString();
+			
+			String sql4 = "select id_farmacia,id_produto,valor_unitario from Produto_Farmacia where id_produto in (" + productsSearchId + ");";
+			
+			PreparedStatement statement4 = DB.connect(variables).prepareStatement(sql4);
+			ResultSet f4 = statement4.executeQuery();
+			
+			List<String> pharmaciesIds = new ArrayList<String>();
+			Map<Integer, Integer> ProductsPharmacies = new HashMap<Integer, Integer>();
+			
+			Map<Integer, String> finalProducts = new HashMap<Integer, String>();
+			
+			while(f4.next()) {
+				pharmaciesIds.add(f4.getString(1));
+				ProductsPharmacies.put(f4.getInt(1), f4.getInt(2));
+				String priceProduct = String.format("%.2f", f4.getFloat(3));
+//				price.put(f4.getInt(2), priceProduct);
+				priceProduct.replace(".", ",");
+				
+				String tmp = productsSearch.get(f4.getInt(2));
+				String tmpProduct = tmp.replace("PRICE_FLOAT", priceProduct);
+				finalProducts.put(f4.getInt(2), tmpProduct);
+			}
+			
+			StringBuffer stringfyPharmaciesIds = new StringBuffer();
+			
+			stringfyPharmaciesIds.append(pharmaciesIds.toString().replace("[", "").replace("]", ""));
+			stringfyPharmaciesIds.toString();
+			
+			String sql5 = "select id_farmacia,nome from Farmacia where id_farmacia in (" + stringfyPharmaciesIds + ");";
+			PreparedStatement statement5 = DB.connect(variables).prepareStatement(sql5);
+			ResultSet f5 = statement5.executeQuery();
 			
 			List<String> products = new ArrayList<String>();
-			products.add("{ id: '11', amount: 'Unidade: 1un', name: 'Dipirona', pharmacy: 'Drogaria São Paulo', price: 'R$ 4,39', image: 'assets/products/dipirona_image.jpg', description: 'A dipirona, também conhecida como dipirona monoidratada ou dipirona sódica, é um remédio analgésico e antitérmico, que age reduzindo a produção de substâncias no corpo responsáveis por causar dor ou febre e, por isso, é indicado para baixar a febre e aliviar a dor, normalmente provocadas por gripes e resfriados, por exemplo.' }");
-			products.add("{ id: '12', amount: 'Cartela: 4cpr', name: 'Neosaldina', pharmacy: 'Drogaria São Paulo', price: 'R$ 3,50', image: 'assets/products/neosadina_image.jpg', description: 'NEOSALDINA é um medicamento com atividade analgésica (diminui a dor) e antiespasmódica (diminui contração involuntária) indicado para o tratamento de diversos tipos de dor de cabeça, incluindo enxaquecas ou para o tratamento de cólicas.' }");
-			products.add("{ id: '13', amount: 'Unidade: 240ml', name: 'Shampoo', pharmacy: 'Drogaria São Paulo', price: 'R$ 8,77', image: 'assets/products/shampoo_image.jpg', description: 'JOHNSON’S® Shampoo de Glicerina foi desenvolvido especialmente para a cabelo delicado do bebê. Suavidade comprovada por diversos estudos, que avaliaram a segurança e a eficácia do produto.' }");
-			products.add("{ id: '14', amount: 'Unidade: 70ml', name: 'Desodorante', pharmacy: 'Drogaria São Paulo', price: 'R$ 12,50', image: 'assets/products/rexona_image.jpg', description: 'Nova Fórmula: 72 horas de proteção contra a transpiração e o mau odor, ativada pelo movimento.' }");
-			products.add("{ id: '15', amount: 'Unidade: 1un', name: 'Vitamina C', pharmacy: 'Drogaria São Paulo', price: 'R$ 12,90', image: 'assets/products/vitamina_c_image.jpg', description: 'É indicado como suplemento vitamínico: auxiliar do sistema imunológico; antioxidante; pós-cirúrgico e cicatrizante; doenças crônicas e convalescença; dietas restritivas e inadequadas; como auxiliar nas anemias carenciais.' }");
-			products.add("{ id: '16', amount: 'Unidade: 1un', name: 'Vitamina D', pharmacy: 'Drogaria São Paulo', price: 'R$ 24,99', image: 'assets/products/vitamina_d_image.jpg', description: 'A vitamina D é uma vitamina lipossolúvel produzida naturalmente no organismo através da exposição da pele à luz solar.' }");
-			products.add("{ id: '17', amount: 'Unidade: 1un', name: 'Engov', pharmacy: 'Drogaria São Paulo', price: 'R$ 2,35', image: 'assets/products/engov_image.jpg', description: 'O Engov é um remédio que tem na composição maleato de mepiramina, hidróxido de alumínio, ácido acetilsalicílico e cafeína que têm ação analgésica, antiácida e estimulante sendo indicado para aliviar os sintomas de ressaca causados pela ingestão de bebidas alcoólicas, como dor de cabeça, náuseas, dor ou sensação de desconforto no estômago, cansaço e dor no corpo, por exemplo.' }");
-			products.add("{ id: '18', amount: 'Unidade: 240ml', name: 'Sabonete Protex', pharmacy: 'Drogaria São Paulo', price: 'R$ 10,43', image: 'assets/products/protex_image.jpg', description: 'O Sabonete em Barra Protex Cream oferece a fragrância delicada e a hidratação que você gosta, com a proteção antibacteriana que você precisa.' }");
-			products.add("{ id: '19', amount: 'Unidade: 1un', name: 'Claritin', pharmacy: 'Drogaria São Paulo', price: 'R$ 18,99', image: 'assets/products/claritin_image.jpg', description: 'O Claritin é indicado para o alívio dos sintomas associados com a rinite alérgica, como: coceira nasal, nariz escorrendo, espirros, ardor e coceira nos olhos, e para o alívio dos sinais e sintomas da urticária e de outras alergias da pele.' }");
+			List<String> pharmacies = new ArrayList<String>();
 			
-			products.add("{ id: '21', amount: 'Unidade: 1un', name: 'Eno', pharmacy: 'Ultrafarma', price: 'R$ 5,00', image: 'assets/products/eno_image.jpg', description: 'Eno Sal de Fruta Tradicional é um antiácido indicado ázia, má digestão e outros transtornos estomacais, tais como excesso de acidez do estômago e indigestão ácida.' }");
-			products.add("{ id: '22', amount: 'Unidade: 1un', name: 'Engov', pharmacy: 'Ultrafarma', price: 'R$ 2,35', image: 'assets/products/engov_image.jpg', description: 'O Engov é um remédio que tem na composição maleato de mepiramina, hidróxido de alumínio, ácido acetilsalicílico e cafeína que têm ação analgésica, antiácida e estimulante sendo indicado para aliviar os sintomas de ressaca causados pela ingestão de bebidas alcoólicas, como dor de cabeça, náuseas, dor ou sensação de desconforto no estômago, cansaço e dor no corpo, por exemplo.' }");
-			products.add("{ id: '23', amount: 'Unidade: 240ml', name: 'Shampoo', pharmacy: 'Ultrafarma', price: 'R$ 8,77', image: 'assets/products/shampoo_image.jpg', description: 'JOHNSON’S® Shampoo de Glicerina foi desenvolvido especialmente para a cabelo delicado do bebê. Suavidade comprovada por diversos estudos, que avaliaram a segurança e a eficácia do produto.' }");
-			products.add("{ id: '24', amount: 'Unidade: 1un', name: 'Claritin', pharmacy: 'Ultrafarma', price: 'R$ 18,99', image: 'assets/products/claritin_image.jpg', description: 'O Claritin é indicado para o alívio dos sintomas associados com a rinite alérgica, como: coceira nasal, nariz escorrendo, espirros, ardor e coceira nos olhos, e para o alívio dos sinais e sintomas da urticária e de outras alergias da pele.' }");
-			products.add("{ id: '25', amount: 'Unidade: 1un', name: 'Dipirona', pharmacy: 'Ultrafarma', price: 'R$ 4,39', image: 'assets/products/dipirona_image.jpg', description: 'A dipirona, também conhecida como dipirona monoidratada ou dipirona sódica, é um remédio analgésico e antitérmico, que age reduzindo a produção de substâncias no corpo responsáveis por causar dor ou febre e, por isso, é indicado para baixar a febre e aliviar a dor, normalmente provocadas por gripes e resfriados, por exemplo.' }");
-			products.add("{ id: '26', amount: 'Cartela: 4cpr', name: 'Neosaldina', pharmacy: 'Ultrafarma', price: 'R$ 3,50', image: 'assets/products/neosadina_image.jpg', description: 'NEOSALDINA é um medicamento com atividade analgésica (diminui a dor) e antiespasmódica (diminui contração involuntária) indicado para o tratamento de diversos tipos de dor de cabeça, incluindo enxaquecas ou para o tratamento de cólicas.' }");
-			products.add("{ id: '27', amount: 'Unidade: 70ml', name: 'Desodorante', pharmacy: 'Ultrafarma', price: 'R$ 12,50', image: 'assets/products/rexona_image.jpg', description: 'Nova Fórmula: 72 horas de proteção contra a transpiração e o mau odor, ativada pelo movimento.' }");
-			products.add("{ id: '28', amount: 'Unidade: 1un', name: 'Vitamina C', pharmacy: 'Ultrafarma', price: 'R$ 12,90', image: 'assets/products/vitamina_c_image.jpg', description: 'É indicado como suplemento vitamínico: auxiliar do sistema imunológico; antioxidante; pós-cirúrgico e cicatrizante; doenças crônicas e convalescença; dietas restritivas e inadequadas; como auxiliar nas anemias carenciais.' }");
-			products.add("{ id: '29', amount: 'Unidade: 240ml', name: 'Sabonete Protex', pharmacy: 'Ultrafarma', price: 'R$ 10,43', image: 'assets/products/protex_image.jpg', description: 'O Sabonete em Barra Protex Cream oferece a fragrância delicada e a hidratação que você gosta, com a proteção antibacteriana que você precisa.' }");
+			while(f5.next()) {
+				int idProduct = ProductsPharmacies.get(f5.getInt(1));
+				
+				String tmp = finalProducts.get(idProduct);
+				String tmpProduct = tmp.replace("PHARMACY_NAME", f5.getString(2));
+				
+				products.add(tmpProduct);
+				pharmacies.add(f5.getString(2));
+			}
 			
-			products.add("{ id: '31', amount: 'Unidade: 1un', name: 'Sabonete Protex', pharmacy: 'Pague Menos', price: 'R$ 10,43', image: 'assets/products/protex_image.jpg', description: 'O Sabonete em Barra Protex Cream oferece a fragrância delicada e a hidratação que você gosta, com a proteção antibacteriana que você precisa.' }");
-			products.add("{ id: '32', amount: 'Unidade: 240ml', name: 'Desodorante', pharmacy: 'Pague Menos', price: 'R$ 12,50', image: 'assets/products/rexona_image.jpg', description: 'Nova Fórmula: 72 horas de proteção contra a transpiração e o mau odor, ativada pelo movimento.' }");
-			products.add("{ id: '33', amount: 'Unidade: 240ml', name: 'Shampoo', pharmacy: 'Pague Menos', price: 'R$ 8,77', image: 'assets/products/shampoo_image.jpg', description: 'JOHNSON’S® Shampoo de Glicerina foi desenvolvido especialmente para a cabelo delicado do bebê. Suavidade comprovada por diversos estudos, que avaliaram a segurança e a eficácia do produto.' }");
-			products.add("{ id: '34', amount: 'Unidade: 1un', name: 'Claritin', pharmacy: 'Pague Menos', price: 'R$ 18,99', image: 'assets/products/claritin_image.jpg', description: 'O Claritin é indicado para o alívio dos sintomas associados com a rinite alérgica, como: coceira nasal, nariz escorrendo, espirros, ardor e coceira nos olhos, e para o alívio dos sinais e sintomas da urticária e de outras alergias da pele.' }");
-			products.add("{ id: '35', amount: 'Unidade: 1un', name: 'Dipirona', pharmacy: 'Pague Menos', price: 'R$ 4,39', image: 'assets/products/dipirona_image.jpg', description: 'A dipirona, também conhecida como dipirona monoidratada ou dipirona sódica, é um remédio analgésico e antitérmico, que age reduzindo a produção de substâncias no corpo responsáveis por causar dor ou febre e, por isso, é indicado para baixar a febre e aliviar a dor, normalmente provocadas por gripes e resfriados, por exemplo.' }");
-			products.add("{ id: '36', amount: 'Cartela: 4cpr', name: 'Neosaldina', pharmacy: 'Pague Menos', price: 'R$ 3,50', image: 'assets/products/neosadina_image.jpg', description: 'NEOSALDINA é um medicamento com atividade analgésica (diminui a dor) e antiespasmódica (diminui contração involuntária) indicado para o tratamento de diversos tipos de dor de cabeça, incluindo enxaquecas ou para o tratamento de cólicas.' }");
-			products.add("{ id: '37', amount: 'Unidade: 70ml', name: 'Desodorante', pharmacy: 'Pague Menos', price: 'R$ 12,50', image: 'assets/products/rexona_image.jpg', description: 'Nova Fórmula: 72 horas de proteção contra a transpiração e o mau odor, ativada pelo movimento.' }");
-			products.add("{ id: '38', amount: 'Unidade: 1un', name: 'Vitamina C', pharmacy: 'Pague Menos', price: 'R$ 12,90', image: 'assets/products/vitamina_c_image.jpg', description: 'É indicado como suplemento vitamínico: auxiliar do sistema imunológico; antioxidante; pós-cirúrgico e cicatrizante; doenças crônicas e convalescença; dietas restritivas e inadequadas; como auxiliar nas anemias carenciais.' }");
-			products.add("{ id: '39', amount: 'Unidade: 1un', name: 'Aspirina', pharmacy: 'Pague Menos', price: 'R$ 4,29', image: 'assets/products/aspirina_image.jpg', description: 'Controle o resfriado: os práticos comprimidos efervescentes Aspirina® C atuam de forma rápida e confiável, pois o ingrediente ativo pode ser rapidamente absorvido pelo corpo. Dor e febre são, portanto, efetivamente aliviadas com o benefício adicional da vitamina C.' }");
-			
-			products.add("{ id: '41', amount: 'Unidade: 1un', name: 'Vitamina C', pharmacy: 'Droga Raia', price: 'R$ 12,90', image: 'assets/products/vitamina_c_image.jpg', description: 'É indicado como suplemento vitamínico: auxiliar do sistema imunológico; antioxidante; pós-cirúrgico e cicatrizante; doenças crônicas e convalescença; dietas restritivas e inadequadas; como auxiliar nas anemias carenciais.' }");
-			products.add("{ id: '42', amount: 'Unidade: 1un', name: 'Vitamina D', pharmacy: 'Droga Raia', price: 'R$ 24,99', image: 'assets/products/vitamina_d_image.jpg', description: 'A vitamina D é uma vitamina lipossolúvel produzida naturalmente no organismo através da exposição da pele à luz solar.' }");
-			products.add("{ id: '43', amount: 'Unidade: 240ml', name: 'Shampoo', pharmacy: 'Droga Raia', price: 'R$ 8,77', image: 'assets/products/shampoo_image.jpg', description: 'JOHNSON’S® Shampoo de Glicerina foi desenvolvido especialmente para a cabelo delicado do bebê. Suavidade comprovada por diversos estudos, que avaliaram a segurança e a eficácia do produto.' }");
-			products.add("{ id: '44', amount: 'Unidade: 1un', name: 'Claritin', pharmacy: 'Droga Raia', price: 'R$ 18,99', image: 'assets/products/claritin_image.jpg', description: 'O Claritin é indicado para o alívio dos sintomas associados com a rinite alérgica, como: coceira nasal, nariz escorrendo, espirros, ardor e coceira nos olhos, e para o alívio dos sinais e sintomas da urticária e de outras alergias da pele.' }");
-			products.add("{ id: '45', amount: 'Unidade: 1un', name: 'Dipirona', pharmacy: 'Droga Raia', price: 'R$ 4,39', image: 'assets/products/dipirona_image.jpg', description: 'A dipirona, também conhecida como dipirona monoidratada ou dipirona sódica, é um remédio analgésico e antitérmico, que age reduzindo a produção de substâncias no corpo responsáveis por causar dor ou febre e, por isso, é indicado para baixar a febre e aliviar a dor, normalmente provocadas por gripes e resfriados, por exemplo.' }");
-			products.add("{ id: '46', amount: 'Cartela: 4cpr', name: 'Neosaldina', pharmacy: 'Droga Raia', price: 'R$ 3,50', image: 'assets/products/neosadina_image.jpg', description: 'NEOSALDINA é um medicamento com atividade analgésica (diminui a dor) e antiespasmódica (diminui contração involuntária) indicado para o tratamento de diversos tipos de dor de cabeça, incluindo enxaquecas ou para o tratamento de cólicas.' }");
-			products.add("{ id: '47', amount: 'Unidade: 70ml', name: 'Desodorante', pharmacy: 'Droga Raia', price: 'R$ 12,50', image: 'assets/products/rexona_image.jpg', description: 'Nova Fórmula: 72 horas de proteção contra a transpiração e o mau odor, ativada pelo movimento.' }");
-			products.add("{ id: '48', amount: 'Unidade: 1un', name: 'Vitamina C', pharmacy: 'Droga Raia', price: 'R$ 12,90', image: 'assets/products/vitamina_c_image.jpg', description: 'É indicado como suplemento vitamínico: auxiliar do sistema imunológico; antioxidante; pós-cirúrgico e cicatrizante; doenças crônicas e convalescença; dietas restritivas e inadequadas; como auxiliar nas anemias carenciais.' }");
-			products.add("{ id: '49', amount: 'Unidade: 240ml', name: 'Sabonete Protex', pharmacy: 'Droga Raia', price: 'R$ 10,43', image: 'assets/products/protex_image.jpg', description: 'O Sabonete em Barra Protex Cream oferece a fragrância delicada e a hidratação que você gosta, com a proteção antibacteriana que você precisa.' }");
+			createPayload.object();
 			
 //			int i = 0;
 //			while(f.next()) {
