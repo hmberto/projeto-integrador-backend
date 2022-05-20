@@ -19,6 +19,8 @@ import br.com.pucsp.projetointegrador.product.Products;
 import br.com.pucsp.projetointegrador.product.ProductsAnon;
 import br.com.pucsp.projetointegrador.product.ProductsAnonStreet;
 import br.com.pucsp.projetointegrador.product.SearchProducts;
+import br.com.pucsp.projetointegrador.product.SearchProductsAnon;
+import br.com.pucsp.projetointegrador.product.SearchProductsAnonStreet;
 import br.com.pucsp.projetointegrador.product.utils.ProjectVariables;
 
 @Produces("application/json")
@@ -111,6 +113,42 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "getProductsSearch");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/product/search/{distance}/{lat}/{lon}/{productName}")
+	public Response getProductsSearchAnon(@PathParam("lat") String lat, @PathParam("lon") String lon, @PathParam("distance") String distance, @PathParam("productName") String productName) {
+		LOG.entering(NAME, "getProductsSearchAnon");
+		try {
+			SearchProductsAnon products = new SearchProductsAnon();
+			JSONObject payload = products.getProducts(variables, distance, lat, lon, productName);
+			
+			LOG.exiting(NAME, "getProductsSearchAnon");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+		}
+		
+		LOG.exiting(NAME, "getProductsSearchAnon");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/product/search/{distance}/{street}/{district}/{state}/{city}/{productName}")
+	public Response getProductsSearchStreet(@PathParam("street") String street, @PathParam("district") String district, @PathParam("state") String state, @PathParam("city") String city, @PathParam("distance") String distance, @PathParam("productName") String productName) {
+		LOG.entering(NAME, "getProductsSearchStreet");
+		try {
+			SearchProductsAnonStreet products = new SearchProductsAnonStreet();
+			JSONObject payload = products.getProducts(variables, distance, street, district, state, city, productName);
+			
+			LOG.exiting(NAME, "getProductsSearchStreet");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+		}
+		
+		LOG.exiting(NAME, "getProductsSearchStreet");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
