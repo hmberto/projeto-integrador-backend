@@ -19,12 +19,14 @@ import javax.ws.rs.core.Response;
 
 import br.com.pucsp.projetointegrador.user.ChangePassword;
 import br.com.pucsp.projetointegrador.user.ConfirmEmail;
+import br.com.pucsp.projetointegrador.user.ContactUs;
 import br.com.pucsp.projetointegrador.user.GetUser;
 import br.com.pucsp.projetointegrador.user.LogIn;
 import br.com.pucsp.projetointegrador.user.LogOut;
 import br.com.pucsp.projetointegrador.user.RecNewPassword;
 import br.com.pucsp.projetointegrador.user.SignUp;
 import br.com.pucsp.projetointegrador.user.Update;
+import br.com.pucsp.projetointegrador.user.contactus.UserMessage;
 import br.com.pucsp.projetointegrador.user.getuser.GenerateUser;
 import br.com.pucsp.projetointegrador.user.login.GenerateLogin;
 import br.com.pucsp.projetointegrador.user.login.LogInUser;
@@ -259,6 +261,28 @@ public class Rest {
 		LOG.log(Level.INFO, "Couldn't update user!");
 		LOG.exiting(NAME, "updateUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@POST
+	@Path("/user/experience/contact")
+	public Response userExperience(@Context HttpServletRequest request, UserMessage message) {
+		LOG.entering(NAME, "userExperience");
+		
+		try {
+			ContactUs contactUs = new ContactUs();
+			boolean check = contactUs.contactUs(request, message);
+			
+			if(check) {
+				LOG.exiting(NAME, "userExperience");
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+		}
+		catch(Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't message us: " + e);
+		}
+		
+		LOG.exiting(NAME, "userExperience");
+		return null;
 	}
 	
 	@OPTIONS
