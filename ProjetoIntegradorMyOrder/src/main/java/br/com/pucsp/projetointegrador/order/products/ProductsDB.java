@@ -111,8 +111,8 @@ public class ProductsDB {
 			createPayload.object();
 			
 			createPayload.key("cep").value(getAddress.get("cep"));
-			createPayload.key("numero").value(getPharmacyAddress.get("numero"));
-			createPayload.key("complemento").value(getPharmacyAddress.get("complemento"));
+			createPayload.key("numero").value(getAddress.get("numero"));
+			createPayload.key("complemento").value(getAddress.get("complemento"));
 			
 			createPayload.endObject();
 			
@@ -136,7 +136,7 @@ public class ProductsDB {
 			createPayload.object();
 			
 			for(int b = 0; b < productsId.size(); b ++) {
-				createPayload.key("productId").value(productsId.get(b));
+				createPayload.key("productId-" + b).value(productsId.get(b));
 			}
 			
 			createPayload.endObject();
