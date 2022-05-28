@@ -98,25 +98,6 @@ public class Rest {
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@GET
 	@Path("/product/search/{distance}/{session}/{productName}")
 	public Response getProductsSearch(@PathParam("session") String session, @PathParam("distance") String distance, @PathParam("productName") String productName) {
