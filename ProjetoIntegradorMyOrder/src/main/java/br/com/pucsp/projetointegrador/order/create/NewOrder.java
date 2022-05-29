@@ -18,16 +18,80 @@ public class NewOrder {
 		this.session = session;
 	}
 	
-	public String getDistance() {
-		return distance;
+	public String getCardNumber() {
+		return cardNumber;
 	}
-	public void setDistance(String distance) {
-		this.distance = distance;
+	public void setCardNumber(String cardNumber) {
+		this.cardNumber = cardNumber;
+	}
+	
+	public String getCardName() {
+		return cardName;
+	}
+	public void setCardName(String cardName) {
+		this.cardName = cardName;
+	}
+	
+	public String getCardDate() {
+		return cardDate;
+	}
+	public void setCardDate(String cardDate) {
+		this.cardDate = cardDate;
+	}
+	
+	public String getCardCvv() {
+		return cardCvv;
+	}
+	public void setCardCvv(String cardCvv) {
+		this.cardCvv = cardCvv;
+	}
+	
+	public String getCardDoc() {
+		return cardDoc;
+	}
+	public void setCardDoc(String cardDoc) {
+		this.cardDoc = cardDoc;
+	}
+	
+	public String getPharmacyDistance() {
+		return pharmacyDistance;
+	}
+	public void setPharmacyDistance(String pharmacyDistance) {
+		this.pharmacyDistance = pharmacyDistance;
+	}
+	
+	public String getDeliveryTime() {
+		return deliveryTime;
+	}
+	public void setDeliveryTime(String deliveryTime) {
+		this.deliveryTime = deliveryTime;
+	}
+	
+	public String getDeliveryFee() {
+		return deliveryFee;
+	}
+	public void setDeliveryFee(String deliveryFee) {
+		this.deliveryFee = deliveryFee;
+	}
+	
+	public String getDeliveryAddress() {
+		return deliveryAddress;
+	}
+	public void setDeliveryAddress(String deliveryAddress) {
+		this.deliveryAddress = deliveryAddress;
 	}
 	
 	String[] products;
 	String session;
-	String distance;
+	String cardNumber;
+	String cardName;
+	String cardDate;
+	String cardCvv;
+	String cardDoc;
+	String pharmacyDistance;
+	String deliveryTime;
+	String deliveryFee;
+	String deliveryAddress;
 	
 	public NewOrder() {}
 }

@@ -13,13 +13,13 @@ public class CreateOrder {
 	private static Logger LOG = Logger.getLogger(Products.class.getName());
 	
 	public JSONObject createOrder(Map <String, String> variables, NewOrder order) {
-		LOG.entering(NAME, "getProducts");
+		LOG.entering(NAME, "createOrder");
 		
 		CreateOrderDB createOrderDB = new CreateOrderDB();
 		
 		JSONObject payload = new JSONObject(createOrderDB.createOrder(variables, order).toString());
 		
-		LOG.exiting(NAME, "getProducts");
+		LOG.exiting(NAME, "createOrder");
 		return payload;
 	}
 }
