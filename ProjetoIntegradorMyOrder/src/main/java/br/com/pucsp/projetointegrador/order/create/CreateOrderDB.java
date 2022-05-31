@@ -85,10 +85,10 @@ public class CreateOrderDB {
 			Map<String, String> getPaymentId = getFromDB.getFromDB(variables, statementPaymentId);
 			statementPaymentId.close();
 			
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("YYYY-MM-DD hh:mm:ss");
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 			String time = dtf.format(LocalDateTime.now());
 			
-			String sqlDelivery = "INSERT INTO Entrega (valor_entrega, data_entrega, hora_entrega, id_entregador) VALUES (?, ?, ?, ?);";
+			String sqlDelivery = "INSERT INTO Entrega (valor_entrega, data_entrega, id_entregador) VALUES (?, ?, ?);";
 			PreparedStatement statementDelivery = DB.connect(variables).prepareStatement(sqlDelivery);
 			statementDelivery.setString(1, order.getDeliveryFee());
 			statementDelivery.setString(2, time);
@@ -97,16 +97,15 @@ public class CreateOrderDB {
 			statementDelivery.execute();
 			statementDelivery.close();
 			
-			String sqlDeliveryId = "SELECT * FROM Entrega WHERE (valor_entrega LIKE ?) AND (data_entrega LIKE ?) AND (id_entregador LIKE ?);";
+			String sqlDeliveryId = "SELECT * FROM Entrega WHERE (valor_entrega LIKE ?) AND (data_entrega LIKE ?);";
 			PreparedStatement statementDeliveryId = DB.connect(variables).prepareStatement(sqlDeliveryId);
 			statementDeliveryId.setString(1, order.getDeliveryFee());
 			statementDeliveryId.setString(2, time);
-			statementDeliveryId.setString(3, null);
 			
 			Map<String, String> getDeliveryId = getFromDB.getFromDB(variables, statementDeliveryId);
 			statementDeliveryId.close();
 			
-			String createOrder = "INSERT INTO Compra (data_compra, distancia_farmacia, tempo_entrega, taxa_entrega, local_entrega, id_usuario, id_farmacia, id_valor, id_entrega, id_forma_pagamento, id_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+			String createOrder = "INSERT INTO Compra (data_compra, distancia_farmacia, tempo_entrega, taxa_entrega, local_entrega, id_usuario, id_farmacia, id_entrega, id_forma_pagamento, id_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			PreparedStatement statementOrder = DB.connect(variables).prepareStatement(createOrder);
 			statementOrder.setString(1, time);
 			statementOrder.setString(2, order.getPharmacyDistance());

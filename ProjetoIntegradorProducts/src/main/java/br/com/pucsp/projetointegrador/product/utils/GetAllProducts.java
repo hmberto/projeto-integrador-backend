@@ -73,9 +73,9 @@ public class GetAllProducts {
 					JSONObject item = new JSONObject(newProductsList0.get(i));
 					
 					if(item.get("id").equals(f3.getString(1))) {
-						String tmp0 = newProductsList0.get(i).replace("AMOUNT_", f3.getString(5));
+						String tmp0 = newProductsList0.get(i).replace("AMOUNT_", f3.getString(3));
 						String tmp1 = tmp0.replace("NAME_", f3.getString(2));
-						String tmp2 = tmp1.replace("IMAGE_", f3.getString(6));
+						String tmp2 = tmp1.replace("IMAGE_", f3.getString(4));
 						String tmp3 = tmp2.replace("DESCRIPTION_", f3.getString(7));
 						
 						newProductsList1.add(tmp3);
