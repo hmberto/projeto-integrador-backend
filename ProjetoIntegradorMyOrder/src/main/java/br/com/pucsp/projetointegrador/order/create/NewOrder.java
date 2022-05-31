@@ -18,6 +18,13 @@ public class NewOrder {
 		this.session = session;
 	}
 	
+	public String getCardFlag() {
+		return cardFlag;
+	}
+	public void setCardFlag(String cardFlag) {
+		this.cardFlag = cardFlag;
+	}
+	
 	public String getCardNumber() {
 		return cardNumber;
 	}
@@ -81,8 +88,23 @@ public class NewOrder {
 		this.deliveryAddress = deliveryAddress;
 	}
 	
+	public String getPharmacyCnpj() {
+		return pharmacyCnpj;
+	}
+	public void setPharmacyCnpj(String pharmacyCnpj) {
+		this.pharmacyCnpj = pharmacyCnpj;
+	}
+	
+	public String getPharmacyId() {
+		return pharmacyId;
+	}
+	public void setPharmacyId(String pharmacyId) {
+		this.pharmacyId = pharmacyId;
+	}
+	
 	String[] products;
 	String session;
+	String cardFlag;
 	String cardNumber;
 	String cardName;
 	String cardDate;
@@ -92,6 +114,8 @@ public class NewOrder {
 	String deliveryTime;
 	String deliveryFee;
 	String deliveryAddress;
+	String pharmacyCnpj;
+	String pharmacyId;
 	
 	public NewOrder() {}
 }

@@ -60,7 +60,7 @@ public class ProductsDB {
 			stringfyProductsCart.append(productsCart.toString().replace("[", "").replace("]", ""));
 			stringfyProductsCart.toString();
 			
-			String sql1 = "SELECT Farmacia.id_farmacia,Farmacia.id_endereco, (6371 *\n"
+			String sql1 = "SELECT Farmacia.cnpj,Farmacia.id_farmacia,Farmacia.id_endereco, (6371 *\n"
 					+ "        acos(\n"
 					+ "            cos(radians(" + getAddress.get("lat") + ")) *\n"
 					+ "            cos(radians(lat)) *\n"
@@ -76,11 +76,13 @@ public class ProductsDB {
 			String pharmacieId = "";
 			String pharmacieIdAddress = "";
 			String pharmacieDistance = "";
+			String PharmacyCnpj = "";
 			
 			while(f.next()) {
-				pharmacieId = f.getString(1);
-				pharmacieIdAddress = f.getString(2);
-				pharmacieDistance = f.getString(3);
+				PharmacyCnpj = f.getString(1);
+				pharmacieId = f.getString(2);
+				pharmacieIdAddress = f.getString(3);
+				pharmacieDistance = f.getString(4);
 			}
 			statement.close();
 			
@@ -122,6 +124,8 @@ public class ProductsDB {
 			double num = Double.parseDouble(pharmacieDistance);
 			String dist = String.format("%.1f", num);
 			
+			createPayload.key("pharmacyId").value(pharmacieId);
+			createPayload.key("pharmacyCnpj").value(PharmacyCnpj);
 			createPayload.key("cep").value(getPharmacyAddress.get("cep"));
 			createPayload.key("distancia").value(dist + " km");
 			createPayload.key("numero").value(getPharmacyAddress.get("numero"));

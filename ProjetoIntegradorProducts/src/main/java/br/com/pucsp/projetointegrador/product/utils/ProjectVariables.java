@@ -14,9 +14,9 @@ public class ProjectVariables {
 		variables.put("MAX_PASS_LENGTH", "25");
 		
 		variables.put("DATABASE_DRIVER", "com.mysql.cj.jdbc.Driver");
-		variables.put("DATABASE_URL", "jdbc:mysql://us-cdbr-east-05.cleardb.net:3306/heroku_75ff03fb4ca6077");
-		variables.put("USERNAME", "b5fc7cc73749d0");
-		variables.put("PASSWORD", "ef08d183");
+		variables.put("DATABASE_URL", System.getenv("DATABASE_URL"));
+		variables.put("USERNAME", System.getenv("USERNAME"));
+		variables.put("PASSWORD", System.getenv("PASSWORD"));
 		variables.put("MAX_POOL", "250");
 		
 		variables.put("EMAIL_PROJETO", System.getenv("EMAIL_PROJETO"));
