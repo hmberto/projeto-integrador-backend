@@ -10,12 +10,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.order.CreateOrder;
+import br.com.pucsp.projetointegrador.order.GetOrders;
 import br.com.pucsp.projetointegrador.order.Products;
 import br.com.pucsp.projetointegrador.order.create.NewOrder;
 import br.com.pucsp.projetointegrador.order.products.GetProducts;
@@ -75,6 +77,24 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "createOrder");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/orders/{session}")
+	public Response getOrders(@PathParam("session") String session) {
+		LOG.entering(NAME, "getOrders");
+		try {
+			GetOrders getOrders = new GetOrders();
+			JSONObject orders = getOrders.getOrder(variables, session);
+			
+			LOG.exiting(NAME, "getOrders");
+			return Response.ok(orders.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find orders: " + e);
+		}
+		
+		LOG.exiting(NAME, "getOrders");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
