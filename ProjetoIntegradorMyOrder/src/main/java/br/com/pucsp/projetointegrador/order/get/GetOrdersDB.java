@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.order.db.DB;
@@ -15,9 +16,13 @@ import br.com.pucsp.projetointegrador.order.db.DB;
 public class GetOrdersDB {
 	public static String NAME = GetOrdersDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(GetOrdersDB.class.getName());
+	
+	List<Float> productsPrice = new ArrayList<Float>();
 
 	public StringBuffer getOrders(Map<String, String> variables, String session, PreparedStatement statementOrders) {
 		LOG.entering(NAME, "getOrders");
+		
+		productsPrice.clear();
 		
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
@@ -30,11 +35,20 @@ public class GetOrdersDB {
 				createPayload.key("order-" + orders.getString(1));
 				createPayload.object();
 				
+				JSONObject products = getOrdersProducts(variables, orders.getString(1));
+				
+				float totalProdutos = 0;
+				
+				for(int i = 0; i < productsPrice.size(); i++) {
+					totalProdutos = totalProdutos + productsPrice.get(i);
+				}
+				
+				createPayload.key("totalProdutos").value(String.format("%.2f", totalProdutos));
+				createPayload.key("products").value(products);
 				createPayload.key("idCompra").value(orders.getString(1));
 				createPayload.key("dataCompra").value(orders.getString(2));
 				createPayload.key("distanciaFarmacia").value(orders.getString(3));
 				createPayload.key("tempoEntrega").value(orders.getString(4));
-				createPayload.key("taxaEntrega").value(orders.getString(5));
 				createPayload.key("localEntrega").value(orders.getString(6));
 				createPayload.key("idFarmacia").value(orders.getString(7));
 				
@@ -56,6 +70,7 @@ public class GetOrdersDB {
 				ResultSet delivery = statementDelivery.executeQuery();
 				while(delivery.next()) {
 					createPayload.key("valorEntrega").value(delivery.getString(1));
+					createPayload.key("totalPedido").value(String.format("%.2f", totalProdutos + Float.parseFloat(delivery.getString(1))));
 					createPayload.key("dataEntrega").value(delivery.getString(2));
 				}
 				statementDelivery.close();
@@ -118,9 +133,53 @@ public class GetOrdersDB {
 			DB.disconnect();
 		}
 
-		// LOG.exiting(NAME, "GetCar");
 		LOG.log(Level.INFO, "Orders: " + payload);
 		LOG.exiting(NAME, "getOrders");
 		return payload;
+	}
+	
+	public JSONObject getOrdersProducts(Map<String, String> variables, String orderId) {
+		LOG.entering(NAME, "getOrdersProducts");
+		
+		StringBuffer payload = new StringBuffer();
+		JSONWriter createPayload = new JSONWriter(payload);
+		
+		try {
+			String sqlProducts = "SELECT quantidade,valor_total_compra_itens FROM Compra_Itens WHERE (id_compra LIKE ?);";
+			PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
+			statementProducts.setString(1, orderId);
+			
+			createPayload.object();
+						
+			ResultSet orders = statementProducts.executeQuery();
+			
+			int i = 1;
+			while(orders.next()) {
+				createPayload.key("product-" + i);
+				createPayload.object();
+				
+				createPayload.key("quantidade").value(orders.getString(1));
+				createPayload.key("valorTotalItem").value(orders.getString(2));
+				
+				productsPrice.add(Float.parseFloat(orders.getString(2)));
+				
+				createPayload.endObject();
+				
+				i++;
+			}
+			
+			createPayload.endObject();
+			
+			LOG.log(Level.INFO, "Products: " + payload);
+			LOG.exiting(NAME, "getOrdersProducts");
+			
+			statementProducts.close();
+		}
+		catch (Exception e) {
+			LOG.log(Level.SEVERE, "Products not getted from the database: " + e);
+		}
+		
+		JSONObject products = new JSONObject(payload.toString());
+		return products;
 	}
 }

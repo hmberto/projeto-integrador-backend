@@ -12,6 +12,7 @@ import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.order.db.DB;
 import br.com.pucsp.projetointegrador.order.db.GetFromDB;
+import br.com.pucsp.projetointegrador.order.utils.InsertProductsDB;
 
 public class CreateOrderDB {
 	public static String NAME = CreateOrderDB.class.getSimpleName();
@@ -24,6 +25,8 @@ public class CreateOrderDB {
 		
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
+		
+		boolean products = false;
 		
 		try {
 			String INSERT_IF_NOT_EXISTS_CARD_FLAG = "INSERT INTO Bandeira_Cartao ( `nome` )\n"
@@ -135,6 +138,15 @@ public class CreateOrderDB {
 			createPayload.key("orderId").value(getOrderId.get("id_compra"));
 			
 			createPayload.endObject();
+			
+			InsertProductsDB insertProductsDB = new InsertProductsDB();
+			products = insertProductsDB.insertProducts(variables, order, getOrderId.get("id_compra"));
+			
+			if(products) {
+				LOG.log(Level.INFO, "Order ID: " + payload);
+				LOG.exiting(NAME, "createOrder");
+				return payload;
+			}
 		}
 		catch (Exception e) {
 			LOG.log(Level.SEVERE, "Order not created at the database: " + e);
@@ -143,9 +155,8 @@ public class CreateOrderDB {
 			DB.disconnect();
 		}
 		
-		// LOG.exiting(NAME, "GetCar");
-		LOG.log(Level.INFO, "Order ID: " + payload);
+		LOG.log(Level.INFO, "Order not created!");
 		LOG.exiting(NAME, "createOrder");
-		return payload;
+		return null;
 	}
 }
