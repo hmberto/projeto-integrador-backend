@@ -85,7 +85,7 @@ public class CreateOrderDB {
 			Map<String, String> getPaymentId = getFromDB.getFromDB(variables, statementPaymentId);
 			statementPaymentId.close();
 			
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			String time = dtf.format(LocalDateTime.now());
 			
 			String sqlDelivery = "INSERT INTO Entrega (valor_entrega, data_entrega, id_entregador) VALUES (?, ?, ?);";
