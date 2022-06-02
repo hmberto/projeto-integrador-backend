@@ -35,7 +35,7 @@ public class GetOrdersDB {
 				createPayload.key("order-" + orders.getString(1));
 				createPayload.object();
 				
-				JSONObject products = getOrdersProducts(variables, orders.getString(1));
+				JSONObject products = getOrdersProducts(variables, orders.getString(1), orders.getString(7));
 				
 				float totalProdutos = 0;
 				
@@ -138,19 +138,19 @@ public class GetOrdersDB {
 		return payload;
 	}
 	
-	public JSONObject getOrdersProducts(Map<String, String> variables, String orderId) {
+	public JSONObject getOrdersProducts(Map<String, String> variables, String orderId, String pharmacyId) {
 		LOG.entering(NAME, "getOrdersProducts");
 		
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		try {
-			String sqlProducts = "SELECT quantidade,valor_total_compra_itens FROM Compra_Itens WHERE (id_compra LIKE ?);";
+			String sqlProducts = "SELECT quantidade,valor_total_compra_itens,id_produto_farmacia FROM Compra_Itens WHERE (id_compra LIKE ?);";
 			PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
 			statementProducts.setString(1, orderId);
 			
 			createPayload.object();
-						
+			LOG.log(Level.INFO, "TESTE 1");
 			ResultSet orders = statementProducts.executeQuery();
 			
 			int i = 1;
@@ -160,6 +160,47 @@ public class GetOrdersDB {
 				
 				createPayload.key("quantidade").value(orders.getString(1));
 				createPayload.key("valorTotalItem").value(orders.getString(2));
+				
+				LOG.log(Level.INFO, "TESTE 2");
+				String sqlProductP = "SELECT id_produto FROM Produto_Farmacia WHERE (id_produto_farmacia LIKE ?);";
+				PreparedStatement statementProductP = DB.connect(variables).prepareStatement(sqlProductP);
+				statementProductP.setString(1, orders.getString(3));
+				
+				String newProductId = "";
+				ResultSet productP = statementProductP.executeQuery();
+				LOG.log(Level.INFO, "TESTE 3");
+				while(productP.next()) {
+					newProductId = productP.getString(1);
+					createPayload.key("idProduto").value(productP.getString(1));
+				}
+				statementProductP.close();
+				
+				LOG.log(Level.INFO, "TESTE 4");
+				String sqlProduct = "SELECT nome,amount,image,description FROM Produto WHERE (id_produto LIKE ?);";
+				PreparedStatement statementProduct = DB.connect(variables).prepareStatement(sqlProduct);
+				statementProduct.setString(1, newProductId);
+											
+				ResultSet product = statementProduct.executeQuery();
+				LOG.log(Level.INFO, "TESTE 5");
+				while(product.next()) {
+					createPayload.key("nomeProduto").value(product.getString(1));
+					createPayload.key("amountProduto").value(product.getString(2));
+					createPayload.key("imageProduto").value(product.getString(3));
+					createPayload.key("descriptionProduto").value(product.getString(4));
+				}
+				statementProduct.close();
+				
+				String sqlProductPharmacy = "SELECT valor_unitario FROM Produto_Farmacia WHERE (id_produto LIKE ?) AND (id_farmacia LIKE ?);";
+				PreparedStatement statementProductPharmacy = DB.connect(variables).prepareStatement(sqlProductPharmacy);
+				statementProductPharmacy.setString(1, newProductId);
+				statementProductPharmacy.setString(2, pharmacyId);
+				LOG.log(Level.INFO, "TESTE 6");
+				ResultSet productPharmacy = statementProductPharmacy.executeQuery();
+				
+				while(productPharmacy.next()) {
+					createPayload.key("valorUnitarioProduto").value(productPharmacy.getString(1));
+				}
+				statementProductPharmacy.close();
 				
 				productsPrice.add(Float.parseFloat(orders.getString(2)));
 				
