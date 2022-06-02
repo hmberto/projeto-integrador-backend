@@ -11,34 +11,18 @@ import java.util.logging.Logger;
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.order.db.DB;
-import br.com.pucsp.projetointegrador.order.db.GetFromDB;
 
 public class GetOrdersDB {
 	public static String NAME = GetOrdersDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(GetOrdersDB.class.getName());
 
-	public StringBuffer getOrders(Map<String, String> variables, String session) {
+	public StringBuffer getOrders(Map<String, String> variables, String session, PreparedStatement statementOrders) {
 		LOG.entering(NAME, "getOrders");
-
-		GetFromDB getFromDB = new GetFromDB();
-
+		
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
 
 		try {
-			String sqlA = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
-			PreparedStatement statementA = DB.connect(variables).prepareStatement(sqlA);
-			statementA.setString(1, session);
-
-			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statementA);
-			statementA.close();
-
-			String userId = getLoginSession.get("id_usuario");
-			
-			String sqlOrders = "SELECT id_compra,data_compra,distancia_farmacia,tempo_entrega,taxa_entrega,local_entrega,id_farmacia,id_entrega,id_forma_pagamento,id_status FROM Compra WHERE (id_usuario LIKE ?);";
-			PreparedStatement statementOrders = DB.connect(variables).prepareStatement(sqlOrders);
-			statementOrders.setString(1, userId);
-			
 			createPayload.object();
 			
 			ResultSet orders = statementOrders.executeQuery();

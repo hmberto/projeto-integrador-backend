@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.order.CreateOrder;
+import br.com.pucsp.projetointegrador.order.GetOrder;
 import br.com.pucsp.projetointegrador.order.GetOrders;
 import br.com.pucsp.projetointegrador.order.Products;
 import br.com.pucsp.projetointegrador.order.create.NewOrder;
@@ -86,7 +87,7 @@ public class Rest {
 		LOG.entering(NAME, "getOrders");
 		try {
 			GetOrders getOrders = new GetOrders();
-			JSONObject orders = getOrders.getOrder(variables, session);
+			JSONObject orders = getOrders.getOrders(variables, session);
 			
 			LOG.exiting(NAME, "getOrders");
 			return Response.ok(orders.toString()).build();
@@ -95,6 +96,24 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "getOrders");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/orders/{orderId}/{session}")
+	public Response getOrder(@PathParam("session") String session, @PathParam("orderId") String orderId) {
+		LOG.entering(NAME, "getOrder");
+		try {
+			GetOrder getOrder = new GetOrder();
+			JSONObject orders = getOrder.getOrder(variables, orderId, session);
+			
+			LOG.exiting(NAME, "getOrder");
+			return Response.ok(orders.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find order: " + e);
+		}
+		
+		LOG.exiting(NAME, "getOrder");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
