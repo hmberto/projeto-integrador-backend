@@ -22,22 +22,23 @@ public class GetOrdersDB {
 	public StringBuffer getOrders(Map<String, String> variables, String session, PreparedStatement statementOrders) {
 		LOG.entering(NAME, "getOrders");
 		
-		productsPrice.clear();
-		
 		StringBuffer payload = new StringBuffer();
 		JSONWriter createPayload = new JSONWriter(payload);
+		
+		float totalProdutos = 0;
 
 		try {
 			createPayload.object();
 			
 			ResultSet orders = statementOrders.executeQuery();
 			while(orders.next()) {
+				productsPrice.clear();
 				createPayload.key("order-" + orders.getString(1));
 				createPayload.object();
 				
 				JSONObject products = getOrdersProducts(variables, orders.getString(1), orders.getString(7));
 				
-				float totalProdutos = 0;
+				totalProdutos = 0;
 				
 				for(int i = 0; i < productsPrice.size(); i++) {
 					totalProdutos = totalProdutos + productsPrice.get(i);
