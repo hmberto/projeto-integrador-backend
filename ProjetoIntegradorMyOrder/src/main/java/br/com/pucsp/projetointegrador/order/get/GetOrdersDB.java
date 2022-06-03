@@ -160,7 +160,7 @@ public class GetOrdersDB {
 				createPayload.object();
 				
 				createPayload.key("quantidade").value(orders.getString(1));
-				createPayload.key("valorTotalItem").value(String.format("%.2f", orders.getString(2)).replace(".", ","));
+				createPayload.key("valorTotalItem").value(String.format("%.2f", Float.parseFloat(orders.getString(2))).replace(".", ","));
 				
 				String sqlProductP = "SELECT id_produto FROM Produto_Farmacia WHERE (id_produto_farmacia LIKE ?);";
 				PreparedStatement statementProductP = DB.connect(variables).prepareStatement(sqlProductP);
@@ -197,7 +197,7 @@ public class GetOrdersDB {
 				ResultSet productPharmacy = statementProductPharmacy.executeQuery();
 				
 				while(productPharmacy.next()) {
-					createPayload.key("valorUnitarioProduto").value(String.format("%.2f", productPharmacy.getString(1)).replace(".", ","));
+					createPayload.key("valorUnitarioProduto").value(String.format("%.2f", Float.parseFloat(productPharmacy.getString(1))).replace(".", ","));
 				}
 				statementProductPharmacy.close();
 				
