@@ -20,6 +20,10 @@ public class GetOrders {
 		GetUserID getUserID = new GetUserID();
 		String userId = getUserID.userId(variables, session);
 		
+		if (userId == null || userId == "null") {
+			return null;
+		}
+		
 		try {
 			String sqlOrders = "SELECT id_compra,data_compra,distancia_farmacia,tempo_entrega,taxa_entrega,local_entrega,id_farmacia,id_entrega,id_forma_pagamento,id_status FROM Compra WHERE (id_usuario LIKE ?);";
 			PreparedStatement statementOrders = DB.connect(variables).prepareStatement(sqlOrders);

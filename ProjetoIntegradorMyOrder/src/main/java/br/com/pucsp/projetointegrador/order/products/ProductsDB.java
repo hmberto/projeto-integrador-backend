@@ -35,6 +35,7 @@ public class ProductsDB {
 			
 			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statementA);
 			statementA.close();
+			LOG.log(Level.INFO, "Login Session: " + getLoginSession);
 			
 			String sqlB = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
 			PreparedStatement statementB = DB.connect(variables).prepareStatement(sqlB);
@@ -42,6 +43,7 @@ public class ProductsDB {
 			
 			Map<String, String> getUser = getFromDB.getFromDB(variables, statementB);
 			statementB.close();
+			LOG.log(Level.INFO, "User: " + getUser);
 			
 			String sqlC = "SELECT * FROM Endereco WHERE (id_endereco LIKE ?);";
 			PreparedStatement statementC = DB.connect(variables).prepareStatement(sqlC);
@@ -49,6 +51,7 @@ public class ProductsDB {
 			
 			Map<String, String> getAddress = getFromDB.getFromDB(variables, statementC);
 			statementC.close();
+			LOG.log(Level.INFO, "User Address: " + getAddress);
 			
 			List<String> productsCart = new ArrayList<String>();
 			for (String e : cart.getProducts()) {
@@ -85,6 +88,8 @@ public class ProductsDB {
 				pharmacieDistance = f.getString(4);
 			}
 			statement.close();
+			
+			LOG.log(Level.INFO, "Pharmacie ID: " + pharmacieId);
 			
 			String sql2 = "select id_produto from Produto_Farmacia where id_farmacia in (" + pharmacieId + ") AND id_produto in (" + stringfyProductsCart + ");";
 			

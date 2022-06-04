@@ -23,15 +23,18 @@ public class GetUserID {
 
 			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statementA);
 			statementA.close();
-
-			LOG.log(Level.INFO, "User ID: " + getLoginSession.get("id_usuario"));
-			LOG.exiting(NAME, "userId");
-			return getLoginSession.get("id_usuario");
+			
+			if(getLoginSession.get("id_usuario") != null && getLoginSession.get("id_usuario") != "null") {
+				LOG.log(Level.INFO, "User ID: " + getLoginSession.get("id_usuario"));
+				LOG.exiting(NAME, "userId");
+				return getLoginSession.get("id_usuario");
+			}			
 		}
 		catch (Exception e) {
 			LOG.log(Level.SEVERE, "User not getted from the database: " + e);
-			LOG.exiting(NAME, "userId");
-			return "";
 		}
+		
+		LOG.exiting(NAME, "userId");
+		return null;
 	}
 }
