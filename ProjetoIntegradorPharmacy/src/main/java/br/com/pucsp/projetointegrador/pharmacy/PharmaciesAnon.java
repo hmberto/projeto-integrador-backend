@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
-import br.com.pucsp.projetointegrador.pharmacy.pharmacies.PharmaciesAnonDB;
+import br.com.pucsp.projetointegrador.pharmacy.pharmacies.PharmaciesDB;
 
 public class PharmaciesAnon {
 	public static String NAME = PharmaciesAnon.class.getSimpleName();
@@ -13,7 +13,7 @@ public class PharmaciesAnon {
 	
 	public JSONObject getPharmacies(Map <String, String> variables, String distance, String lat, String lon) {
 		LOG.entering(NAME, "getPharmacies");
-		PharmaciesAnonDB pharmaciesDB = new PharmaciesAnonDB();
+		PharmaciesDB pharmaciesDB = new PharmaciesDB();
 		
 		if(distance.length() < 3) {
 			JSONObject payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, lat, lon).toString());

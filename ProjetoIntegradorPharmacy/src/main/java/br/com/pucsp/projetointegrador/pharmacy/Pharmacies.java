@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.pharmacy.pharmacies.PharmaciesDB;
+import br.com.pucsp.projetointegrador.pharmacy.utils.GetUserCoordinates;
 
 public class Pharmacies {
 	public static String NAME = Pharmacies.class.getSimpleName();
@@ -18,7 +19,10 @@ public class Pharmacies {
 		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
 		if(distance.length() < 3) {
 			if(session.length() == SESSION_LENGTH) {
-				JSONObject payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, session).toString());
+				GetUserCoordinates getUserCoordinates = new GetUserCoordinates();
+				Map<String, String> getAddress = getUserCoordinates.coordinatesFromDB(variables, session);
+				
+				JSONObject payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, getAddress.get("lat"), getAddress.get("lon")).toString());
 				
 				LOG.exiting(NAME, "getPharmacies");
 				return payload;
