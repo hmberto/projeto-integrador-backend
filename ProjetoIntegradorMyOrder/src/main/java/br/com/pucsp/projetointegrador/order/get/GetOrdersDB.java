@@ -108,7 +108,7 @@ public class GetOrdersDB {
 						
 						String sqlFlag = "SELECT nome FROM Bandeira_Cartao WHERE (id_bandeira LIKE ?);";
 						PreparedStatement statementFlag = DB.connect(variables).prepareStatement(sqlFlag);
-						statementFlag.setString(1, orders.getString(10));
+						statementFlag.setString(1, card.getString(2));
 										
 						ResultSet flag = statementFlag.executeQuery();
 						while(flag.next()) {
