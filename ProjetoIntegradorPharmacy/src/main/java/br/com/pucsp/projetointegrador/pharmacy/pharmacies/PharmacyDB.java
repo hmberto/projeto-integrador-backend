@@ -101,7 +101,7 @@ public class PharmacyDB {
 			String pharmacyName = pharmacies.get(a);
 			
 			createPayload.key("pharmacyName").value(pharmacyName);
-			createPayload.key("pharmacyImage").value(ReplaceImageNames.replaceNames(pharmacyName));
+			createPayload.key("pharmacyImage").value(ReplaceImageNames.replaceNames(pharmacyName.toLowerCase()) + ".png");
 			
 			createPayload.key("products");
 			
