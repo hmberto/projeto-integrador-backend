@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import br.com.pucsp.projetointegrador.pharmacy.Pharmacies;
 import br.com.pucsp.projetointegrador.pharmacy.PharmaciesAnon;
 import br.com.pucsp.projetointegrador.pharmacy.PharmaciesAnonStreet;
+import br.com.pucsp.projetointegrador.pharmacy.PharmacyID;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ProjectVariables;
 
 @Produces("application/json")
@@ -92,6 +93,24 @@ public class Rest {
 		}
 		
 		LOG.exiting(NAME, "getPharmaciesAnon");
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/pharmacy/{pharmacyId}")
+	public Response getPharmacy(@PathParam("pharmacyId") String pharmacyId) {
+		LOG.entering(NAME, "getPharmacy");
+		try {
+			PharmacyID pharmacyID = new PharmacyID();
+			JSONObject payload = pharmacyID.getPharmacy(variables, pharmacyId);
+			
+			LOG.exiting(NAME, "getPharmacy");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, "Couldn't find pharmacy: " + e);
+		}
+		
+		LOG.exiting(NAME, "getPharmacy");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
