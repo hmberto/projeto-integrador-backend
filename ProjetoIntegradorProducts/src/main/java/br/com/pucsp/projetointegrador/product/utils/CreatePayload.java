@@ -13,7 +13,10 @@ public class CreatePayload {
 		createPayload.object();
 		
 		for(int a = 0; a < pharmacies.size(); a ++) {
-			String pharmacyName = pharmacies.get(a);
+			String[] pharmacyNameId = pharmacies.get(a).split("-");
+			String pharmacyId = pharmacyNameId[0];
+			String pharmacyName = pharmacyNameId[1];
+			
 			createPayload.key(pharmacyName);
 			
 			createPayload.object();
@@ -29,6 +32,7 @@ public class CreatePayload {
 					createPayload.key("amount").value(item.get("amount"));
 					createPayload.key("name").value(item.get("name"));
 					createPayload.key("pharmacy").value(item.get("pharmacy"));
+					createPayload.key("pharmacyId").value(pharmacyId);
 					createPayload.key("price").value(item.get("price"));
 					createPayload.key("image").value(item.get("image"));
 					createPayload.key("description").value(item.get("description"));

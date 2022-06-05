@@ -149,7 +149,7 @@ public class GetAllProducts {
 				String tmpProduct = tmp.replace("PHARMACY_NAME", f5.getString(2));
 				
 				products.add(tmpProduct);
-				pharmacies.add(f5.getString(2));
+				pharmacies.add(f5.getString(1) + "-" + f5.getString(2));
 				
 				for(int i = 0; i < newProductsList2.size(); i++) {
 					JSONObject item = new JSONObject(newProductsList2.get(i));
