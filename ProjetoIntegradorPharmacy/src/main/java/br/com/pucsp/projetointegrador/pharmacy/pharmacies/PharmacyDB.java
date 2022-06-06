@@ -35,7 +35,7 @@ public class PharmacyDB {
 			statementPharmacy.close();
 			
 			List<String> pharmacies = new ArrayList<String>();
-			pharmacies.add(getPharmacy.get("nome"));
+			pharmacies.add(getPharmacy.get("id_farmacia") + "-" + getPharmacy.get("nome"));
 			
 			String sqlProductPharmacy = "SELECT id_produto,valor_unitario FROM Produto_Farmacia WHERE (id_farmacia LIKE ?);";
 			PreparedStatement statementProductPharmacy = DB.connect(variables).prepareStatement(sqlProductPharmacy);
@@ -98,7 +98,9 @@ public class PharmacyDB {
 		createPayload.object();
 		
 		for(int a = 0; a < pharmacies.size(); a ++) {
-			String pharmacyName = pharmacies.get(a);
+			String[] pharmacyNameId = pharmacies.get(a).split("-");
+			String pharmacyId = pharmacyNameId[0];
+			String pharmacyName = pharmacyNameId[1];
 			
 			createPayload.key("pharmacyName").value(pharmacyName);
 			createPayload.key("pharmacyImage").value(ReplaceImageNames.replaceNames(pharmacyName.toLowerCase()) + ".png");
@@ -117,7 +119,8 @@ public class PharmacyDB {
 					createPayload.key("id").value(item.get("id"));
 					createPayload.key("amount").value(item.get("amount"));
 					createPayload.key("name").value(item.get("name"));
-					createPayload.key("pharmacy").value(item.get("pharmacy"));
+					createPayload.key("pharmacy").value(pharmacyName);
+					createPayload.key("pharmacyId").value(pharmacyId);
 					createPayload.key("price").value(item.get("price"));
 					createPayload.key("image").value(item.get("image"));
 					createPayload.key("description").value(item.get("description"));
