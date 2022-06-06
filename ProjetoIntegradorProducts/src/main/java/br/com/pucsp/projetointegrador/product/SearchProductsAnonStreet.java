@@ -1,5 +1,6 @@
 package br.com.pucsp.projetointegrador.product;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -13,7 +14,7 @@ public class SearchProductsAnonStreet {
 	public static String NAME = SearchProductsAnonStreet.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(SearchProductsAnonStreet.class.getName());
 	
-	public JSONObject getProducts(Map <String, String> variables, String distance, String street, String district, String state, String city, String productName) {
+	public JSONObject getProducts(Map <String, String> variables, String distance, String street, String district, String state, String city, String productName) throws IOException {
 		LOG.entering(NAME, "getProducts");
 		ProductsDB productsDB = new ProductsDB();
 		

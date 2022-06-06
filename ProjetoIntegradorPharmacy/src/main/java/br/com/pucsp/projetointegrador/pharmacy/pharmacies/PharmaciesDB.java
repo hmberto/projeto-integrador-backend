@@ -2,6 +2,7 @@ package br.com.pucsp.projetointegrador.pharmacy.pharmacies;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,34 +12,33 @@ import org.json.JSONWriter;
 import br.com.pucsp.projetointegrador.pharmacy.db.DB;
 import br.com.pucsp.projetointegrador.pharmacy.utils.CalcFeeDelivery;
 import br.com.pucsp.projetointegrador.pharmacy.utils.CalcTimeDelivery;
+import br.com.pucsp.projetointegrador.pharmacy.utils.LogMessage;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ReplaceImageNames;
 
 public class PharmaciesDB {
-	public static String NAME = PharmaciesDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(PharmaciesDB.class.getName());
+	private static String name = PharmaciesDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(PharmaciesDB.class.getName());
 	
-	public StringBuffer getPharmacies(Map <String, String> variables, String distance, String lat, String lon) {
-		LOG.entering(NAME, "getPharmacies");
+	public StringBuilder getPharmacies(Map <String, String> variables, String distance, String lat, String lon) throws SQLException {
+		log.entering(name, "getPharmacies");
 		
-		StringBuffer payload = new StringBuffer();
+		StringBuilder payload = new StringBuilder();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
+		String sql = "SELECT Farmacia.nome, Farmacia.id_farmacia, (6371 *\n"
+				+ "        acos(\n"
+				+ "            cos(radians(" + lat + ")) *\n"
+				+ "            cos(radians(lat)) *\n"
+				+ "            cos(radians(" + lon + ") - radians(lon)) +\n"
+				+ "            sin(radians(" + lat + ")) *\n"
+				+ "            sin(radians(lat))\n"
+				+ "        )) AS distance\n"
+				+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
+		
+		PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
+		
 		try {
-			String sql = "SELECT Farmacia.nome, Farmacia.id_farmacia, (6371 *\n"
-					+ "        acos(\n"
-					+ "            cos(radians(" + lat + ")) *\n"
-					+ "            cos(radians(lat)) *\n"
-					+ "            cos(radians(" + lon + ") - radians(lon)) +\n"
-					+ "            sin(radians(" + lat + ")) *\n"
-					+ "            sin(radians(lat))\n"
-					+ "        )) AS distance\n"
-					+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
-			
-			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
-			
 			ResultSet f = statement.executeQuery();
-			
-			LOG.log(Level.INFO, "Nearby pharmacies getted from DB");
 			
 			createPayload.object();
 			
@@ -64,19 +64,17 @@ public class PharmaciesDB {
 			}
 			
 			createPayload.endObject();
-			
-			statement.close();
 		}
 		catch (Exception e) {
-			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
+			statement.close();
 			DB.disconnect();
 		}
 		
-		// LOG.exiting(NAME, "GetCar");
-		LOG.log(Level.INFO, "Nearby pharmacies payload: " + payload);
-		LOG.exiting(NAME, "getPharmacies");
+		log.log(Level.INFO, "Nearby pharmacies getted from DB! payload: " + payload);
+		log.exiting(name, "getPharmacies");
 		return payload;
 	}
 }

@@ -1,5 +1,6 @@
 package br.com.pucsp.projetointegrador.product;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -12,7 +13,7 @@ public class SearchProducts {
 	public static String NAME = SearchProducts.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(SearchProducts.class.getName());
 	
-	public JSONObject getProducts(Map <String, String> variables, String distance, String session, String productName) {
+	public JSONObject getProducts(Map <String, String> variables, String distance, String session, String productName) throws SQLException {
 		LOG.entering(NAME, "getProducts");
 		ProductsDB productsDB = new ProductsDB();
 		

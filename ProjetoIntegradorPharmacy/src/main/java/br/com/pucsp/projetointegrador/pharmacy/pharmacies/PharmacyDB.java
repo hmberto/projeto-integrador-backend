@@ -2,10 +2,11 @@ package br.com.pucsp.projetointegrador.pharmacy.pharmacies;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
@@ -13,38 +14,53 @@ import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.pharmacy.db.DB;
 import br.com.pucsp.projetointegrador.pharmacy.db.GetFromDB;
+import br.com.pucsp.projetointegrador.pharmacy.utils.LogMessage;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ReplaceImageNames;
 
 public class PharmacyDB {
-	public static String NAME = PharmacyDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(PharmacyDB.class.getName());
+	private static String name = PharmacyDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(PharmacyDB.class.getName());
 	
-	public StringBuffer getPharmacy(Map <String, String> variables, String pharmacyId) {
-		LOG.entering(NAME, "getPharmacy");
+	public StringBuilder getPharmacy(Map <String, String> variables, String pharmacyId) throws SQLException {
+		log.entering(name, "getPharmacy");
 		
 		GetFromDB getFromDB = new GetFromDB();
 		
-		StringBuffer payload = new StringBuffer();
+		StringBuilder payload = new StringBuilder();
+		
+		String sqlPharmacy = "SELECT * FROM Farmacia WHERE (id_farmacia LIKE ?);";
+		PreparedStatement statementPharmacy = DB.connect(variables).prepareStatement(sqlPharmacy);
+		
+		Map<String, String> getPharmacy = new HashMap<String, String>();
+		List<String> pharmacies = new ArrayList<String>();
 		
 		try {
-			String sqlPharmacy = "SELECT * FROM Farmacia WHERE (id_farmacia LIKE ?);";
-			PreparedStatement statementPharmacy = DB.connect(variables).prepareStatement(sqlPharmacy);
 			statementPharmacy.setString(1, pharmacyId);
 			
-			Map<String, String> getPharmacy = getFromDB.getFromDB(variables, statementPharmacy);
+			getPharmacy = getFromDB.getFromDB(variables, statementPharmacy);
 			statementPharmacy.close();
 			
-			List<String> pharmacies = new ArrayList<String>();
+			pharmacies = new ArrayList<String>();
 			pharmacies.add(getPharmacy.get("id_farmacia") + "-" + getPharmacy.get("nome"));
-			
-			String sqlProductPharmacy = "SELECT id_produto,valor_unitario FROM Produto_Farmacia WHERE (id_farmacia LIKE ?);";
-			PreparedStatement statementProductPharmacy = DB.connect(variables).prepareStatement(sqlProductPharmacy);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statementPharmacy.close();
+			DB.disconnect();
+		}
+		
+		String sqlProductPharmacy = "SELECT id_produto,valor_unitario FROM Produto_Farmacia WHERE (id_farmacia LIKE ?);";
+		PreparedStatement statementProductPharmacy = DB.connect(variables).prepareStatement(sqlProductPharmacy);
+		
+		List<String> productsId = new ArrayList<String>();
+		List<String> productsListA = new ArrayList<String>();
+		
+		try {
 			statementProductPharmacy.setString(1, pharmacyId);
 			
 			ResultSet productPharmacy = statementProductPharmacy.executeQuery();
-			
-			List<String> productsId = new ArrayList<String>();
-			List<String> productsListA = new ArrayList<String>();
 			
 			while(productPharmacy.next()) {
 				String priceProduct = String.format("%.2f", productPharmacy.getFloat(2)).replace(".", ",");
@@ -52,18 +68,27 @@ public class PharmacyDB {
 				productsId.add(productPharmacy.getString(1));
 				productsListA.add("{ id: '" + productPharmacy.getString(1) + "', amount: '" + "AMOUNT_" + "', name: '" + "NAME_" + "', pharmacy: '" + getPharmacy.get("nome") + "', price: 'R$ " + priceProduct + "', image: '" + "IMAGE_" + "', description: '" + "DESCRIPTION_" + "' }");
 			}
-			
-			StringBuffer stringfyProducts = new StringBuffer();
-			
-			stringfyProducts.append(productsId.toString().replace("[", "").replace("]", ""));
-			stringfyProducts.toString();
-			
-			String sqlProducts = "SELECT * FROM Produto WHERE id_produto in (" + stringfyProducts + ");";
-			
-			PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statementProductPharmacy.close();
+			DB.disconnect();
+		}
+		
+		StringBuilder stringfyProducts = new StringBuilder();
+		
+		stringfyProducts.append(productsId.toString().replace("[", "").replace("]", ""));
+		stringfyProducts.toString();
+		
+		String sqlProducts = "SELECT * FROM Produto WHERE id_produto in (" + stringfyProducts + ");";
+		PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
+		
+		List<String> productsList = new ArrayList<String>();
+		
+		try {
 			ResultSet pProducts = statementProducts.executeQuery();
-			
-			List<String> productsList = new ArrayList<String>();
 			
 			while(pProducts.next()) {
 				for(int i = 0; i < productsListA.size(); i++) {
@@ -82,17 +107,20 @@ public class PharmacyDB {
 			
 			payload = payload(pharmacies, productsList);
 		}
-		catch (Exception e) {
-			LOG.log(Level.SEVERE, "PharmacyDB.getPharmacy: " + e);
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statementProducts.close();
+			DB.disconnect();
 		}
 		
-		LOG.exiting(NAME, "getPharmacy");
-		
+		log.exiting(name, "getPharmacy");
 		return payload;
 	}
 	
-	public StringBuffer payload(List<String> pharmacies, List<String> productsList) {
-		StringBuffer payload = new StringBuffer();
+	public StringBuilder payload(List<String> pharmacies, List<String> productsList) {
+		StringBuilder payload = new StringBuilder();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		createPayload.object();

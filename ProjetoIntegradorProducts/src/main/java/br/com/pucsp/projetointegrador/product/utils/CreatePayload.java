@@ -6,8 +6,8 @@ import org.json.JSONObject;
 import org.json.JSONWriter;
 
 public class CreatePayload {
-	public StringBuffer payload(List<String> pharmacies, List<String> newProductsList) {
-		StringBuffer payload = new StringBuffer();
+	public StringBuilder payload(List<String> pharmacies, List<String> newProductsList) {
+		StringBuilder payload = new StringBuilder();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		createPayload.object();

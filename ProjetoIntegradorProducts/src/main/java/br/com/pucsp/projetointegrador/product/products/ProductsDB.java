@@ -11,10 +11,10 @@ public class ProductsDB {
 	public static String NAME = ProductsDB.class.getSimpleName();
 	private static Logger LOG = Logger.getLogger(ProductsDB.class.getName());
 	
-	public StringBuffer getProducts(Map <String, String> variables, String sql1, String sql3p1) {
+	public StringBuilder getProducts(Map <String, String> variables, String sql1, String sql3p1) {
 		LOG.entering(NAME, "getProducts");
 		
-		StringBuffer payload = new StringBuffer();
+		StringBuilder payload = new StringBuilder();
 		
 		try {
 			GetAllProducts getAllProducts = new GetAllProducts();

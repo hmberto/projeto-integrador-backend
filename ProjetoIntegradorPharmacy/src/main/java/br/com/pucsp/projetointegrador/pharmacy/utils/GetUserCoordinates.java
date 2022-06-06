@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,87 +17,108 @@ import br.com.pucsp.projetointegrador.pharmacy.db.DB;
 import br.com.pucsp.projetointegrador.pharmacy.db.GetFromDB;
 
 public class GetUserCoordinates {
-	public static String NAME = GetUserCoordinates.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetUserCoordinates.class.getName());
+	private static String name = GetUserCoordinates.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetUserCoordinates.class.getName());
 	
 	GetFromDB getFromDB = new GetFromDB();
 	
-	public String coordinates(String street, String number) {
-		LOG.entering(NAME, "coordinates");
+	public String coordinates(String street, String number) throws IOException {
+		log.entering(name, "coordinates");
 		String[] streetSplit= street.split(" ");
 		
-		String output = "";
-		
-		String address = "";
+		StringBuilder address = new StringBuilder();
 		for(int i = 0; i < streetSplit.length; i++) {
 			if(i == 0) {
-				address = streetSplit[i];
+				address.append(streetSplit[i]);
 			}
 			else {
-				address = address + "+" + streetSplit[i];
+				address.append("+" + streetSplit[i]);
 			}
 		}
 		
-		String url = "https://nominatim.openstreetmap.org/search.php?street=" + address + "%2c" + number + "&format=jsonv2";
+		log.log(Level.INFO, "address: " + address.toString());
 		
-		try {
-			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-			conn.setRequestMethod("GET");
-	        
-	        if (conn.getResponseCode() != 200) {
-	            LOG.log(Level.SEVERE, "Erro " + conn.getResponseCode() + " ao obter dados da URL " + url);
-	        }
-	        
-	        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-	        
-	        String line;
-	        while ((line = br.readLine()) != null) {
-	            output += line;
-	        }
-	        
-	        conn.disconnect();
-		}
-		catch (IOException e) {
-			LOG.log(Level.SEVERE, "User coordinates not geted: " + e);
-		}
+		String url = "https://nominatim.openstreetmap.org/search.php?street=" + address.toString() + "%2c" + number + "&format=jsonv2";
 		
-		LOG.log(Level.INFO, "User coordinates getted");
-		LOG.exiting(NAME, "coordinates");
-		return output;
+		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+		conn.setRequestMethod("GET");
+        
+        if (conn.getResponseCode() != 200) {
+        	throw new ProtocolException(LogMessage.message("API '" + url + "' - Status Code " + conn.getResponseCode()));
+        }
+        
+        log.log(Level.INFO, "API '" + url + "' - Status Code " + conn.getResponseCode());
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+        
+        String line;
+        StringBuilder output = new StringBuilder();
+        while ((line = br.readLine()) != null) {
+        	output.append(line);
+        }
+        
+        conn.disconnect();
+		
+		log.log(Level.INFO, "User coordinates getted: " + output.toString());
+		log.exiting(name, "coordinates");
+		return output.toString();
 	}
-	
-	public Map<String, String> coordinatesFromDB(Map <String, String> variables, String session) {
-		LOG.entering(NAME, "coordinatesFromDB");
+		
+	public Map<String, String> coordinatesFromDB(Map <String, String> variables, String session) throws SQLException {
+		log.entering(name, "coordinatesFromDB");
+		
+		Map<String, String> getLoginSession = new HashMap<String, String>();
+		String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
+		PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
 		
 		try {
-			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
-			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
 			statement1.setString(1, session);
 			
-			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statement1);
-			statement1.close();
-			
-			String sql2 = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
-			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
-			statement2.setString(1, getLoginSession.get("id_usuario"));
-			
-			Map<String, String> getUser = getFromDB.getFromDB(variables, statement2);
-			statement2.close();
-			
-			String sql3 = "SELECT lat, lon FROM Endereco WHERE (id_endereco LIKE ?);";
-			PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
-			statement3.setString(1, getUser.get("id_endereco"));
-			
-			Map<String, String> getAddress = getFromDB.getFromDB(variables, statement3);
-			statement3.close();
-			
-			return getAddress;
+			getLoginSession = getFromDB.getFromDB(variables, statement1);
 		}
-		catch (Exception e) {
-			LOG.log(Level.SEVERE, "User not geted from the database: " + e);
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statement1.close();
+			DB.disconnect();
 		}
 		
-		LOG.exiting(NAME, "coordinatesFromDB");
-		return null;
+		log.log(Level.INFO, "Login Session: " + getLoginSession.toString());
+		
+		Map<String, String> getUser = new HashMap<String, String>();
+		String sql2 = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
+		PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
+		
+		try {
+			statement2.setString(1, getLoginSession.get("id_usuario"));
+			
+			getUser = getFromDB.getFromDB(variables, statement2);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statement2.close();
+			DB.disconnect();
+		}
+		
+		log.log(Level.INFO, "User: " + getUser.toString());
+		
+		String sql3 = "SELECT lat, lon FROM Endereco WHERE (id_endereco LIKE ?);";
+		PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
+		
+		try {
+			statement3.setString(1, getUser.get("id_endereco"));
+			
+			return getFromDB.getFromDB(variables, statement3);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statement3.close();
+			DB.disconnect();
+		}
 	}
 }
