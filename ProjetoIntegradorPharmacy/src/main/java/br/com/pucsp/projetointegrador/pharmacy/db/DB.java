@@ -8,8 +8,11 @@ import java.sql.DriverManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import br.com.pucsp.projetointegrador.pharmacy.utils.LogMessage;
+
 public class DB {
 	private DB () {}
+	
 	private static String name = DB.class.getSimpleName();
 	private static Logger log = Logger.getLogger(DB.class.getName());
 	
@@ -26,13 +29,11 @@ public class DB {
     		properties.setProperty("MaxPooledStatements", variables.get("MAX_POOL"));
     	}
     	
-    	log.log(Level.INFO, "Properties setuped");
-    	
     	log.exiting(name, "getProperties");
     	return properties;
     }
 
-	public static Connection connect(Map <String, String> variables) {
+	public static Connection connect(Map <String, String> variables) throws SQLException {
 		log.entering(name, "connect");
 		
 		if (connection == null) {
@@ -42,7 +43,7 @@ public class DB {
 				
 				log.log(Level.INFO, "Connection started");
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Connection not started" + e);
+				throw new SQLException(LogMessage.message(e.toString()));
 			}
 		}
 		
@@ -50,7 +51,7 @@ public class DB {
 		return connection;
 	}
 
-	public static void disconnect() {
+	public static void disconnect() throws SQLException {
 		log.entering(name, "disconnect");
 		
         if (connection != null) {
@@ -60,7 +61,7 @@ public class DB {
                 
                 log.log(Level.INFO, "Connection closed");
             } catch (SQLException e) {
-            	log.log(Level.SEVERE, "Connection not closed" + e);
+            	throw new SQLException(LogMessage.message(e.toString()));
             }
         }
         

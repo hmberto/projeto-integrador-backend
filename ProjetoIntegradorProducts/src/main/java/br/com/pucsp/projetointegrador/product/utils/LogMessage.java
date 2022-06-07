@@ -1,6 +1,8 @@
 package br.com.pucsp.projetointegrador.product.utils;
 
 public class LogMessage {
+	private LogMessage () {}
+	
 	public static String message(String e) {
 		return "Message: " + e;
 	}

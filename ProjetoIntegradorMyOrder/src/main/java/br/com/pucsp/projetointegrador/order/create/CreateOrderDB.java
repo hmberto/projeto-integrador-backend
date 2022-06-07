@@ -86,11 +86,13 @@ public class CreateOrderDB {
 		String sqlCard = "INSERT INTO Cartao (numero, data_validade, cvv, id_usuario, id_bandeira) VALUES (?, ?, ?, ?, ?);";
 		PreparedStatement statementCard = DB.connect(variables).prepareStatement(sqlCard);
 		
+		String idUsuario = getLoginSession.get("id_usuario");
+		
 		try {
 			statementCard.setString(1, order.getCardNumber());
 			statementCard.setString(2, order.getCardDate());
 			statementCard.setString(3, order.getCardCvv());
-			statementCard.setString(4, getLoginSession.get("id_usuario"));
+			statementCard.setString(4, idUsuario);
 			statementCard.setString(5, fkCardFlag);
 			
 			statementCard.execute();
@@ -196,7 +198,7 @@ public class CreateOrderDB {
 			statementOrder.setString(3, order.getDeliveryTime());
 			statementOrder.setString(4, order.getDeliveryFee());
 			statementOrder.setString(5, order.getDeliveryAddress());
-			statementOrder.setString(6, getLoginSession.get("id_usuario"));
+			statementOrder.setString(6, idUsuario);
 			statementOrder.setString(7, order.getPharmacyId());
 			statementOrder.setString(8, getDeliveryId.get("id_entrega"));
 			statementOrder.setString(9, getPaymentId.get("id_forma_pagamento"));
@@ -216,7 +218,7 @@ public class CreateOrderDB {
 		
 		try {
 			statementOrderId.setString(1, time);
-			statementOrderId.setString(2, getLoginSession.get("id_usuario"));
+			statementOrderId.setString(2, idUsuario);
 			statementOrderId.setString(3, order.getPharmacyId());
 			
 			Map<String, String> getOrderId = getFromDB.getFromDB(statementOrderId);

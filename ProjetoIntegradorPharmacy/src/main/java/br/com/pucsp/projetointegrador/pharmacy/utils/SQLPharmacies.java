@@ -1,6 +1,8 @@
 package br.com.pucsp.projetointegrador.pharmacy.utils;
 
 public class SQLPharmacies {
+	private SQLPharmacies () {}
+	
 	public static String sql(String lat, String lon, String distance) {
 		return "SELECT Farmacia.nome, Farmacia.id_farmacia, (6371 *\n"
 				+ "        acos(\n"

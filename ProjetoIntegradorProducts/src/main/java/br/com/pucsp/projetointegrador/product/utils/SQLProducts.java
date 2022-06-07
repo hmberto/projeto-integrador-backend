@@ -19,7 +19,7 @@ public class SQLProducts {
 	}
 	
 	public static String productsIn() {
-		return "SELECT * FROM produto WHERE id_produto in (";
+		return "SELECT * FROM produto WHERE id_produto in (" + "";
 	}
 	
 	public static String productsInSearch(String productName) {
@@ -42,14 +42,6 @@ public class SQLProducts {
 	        lon = obj.getString("lon");
 		}
 		
-		return "SELECT Farmacia.id_farmacia, (6371 *\n"
-				+ "        acos(\n"
-				+ "            cos(radians(" + lat + ")) *\n"
-				+ "            cos(radians(lat)) *\n"
-				+ "            cos(radians(" + lon + ") - radians(lon)) +\n"
-				+ "            sin(radians(" + lat + ")) *\n"
-				+ "            sin(radians(lat))\n"
-				+ "        )) AS distance\n"
-				+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
+		return products(lat, lon, distance);
 	}
 }

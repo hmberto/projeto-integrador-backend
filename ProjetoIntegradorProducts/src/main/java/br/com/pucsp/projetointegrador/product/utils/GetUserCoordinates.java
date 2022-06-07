@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import br.com.pucsp.projetointegrador.product.db.DB;
@@ -37,8 +36,6 @@ public class GetUserCoordinates {
 			}
 		}
 		
-		log.log(Level.INFO, "address: " + address.toString());
-		
 		String url = "https://nominatim.openstreetmap.org/search.php?street=" + address.toString() + "%2c" + number + "&format=jsonv2";
 		
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -47,8 +44,6 @@ public class GetUserCoordinates {
         if (conn.getResponseCode() != 200) {
         	throw new ProtocolException(LogMessage.message("API '" + url + "' - Status Code " + conn.getResponseCode()));
         }
-        
-        log.log(Level.INFO, "API '" + url + "' - Status Code " + conn.getResponseCode());
         
         BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
         
@@ -60,7 +55,6 @@ public class GetUserCoordinates {
         
         conn.disconnect();
 		
-		log.log(Level.INFO, "User coordinates getted: " + output.toString());
 		log.exiting(name, methodName);
 		return output.toString();
 	}
@@ -86,8 +80,6 @@ public class GetUserCoordinates {
 			DB.disconnect();
 		}
 		
-		log.log(Level.INFO, "Login Session: " + getLoginSession.toString());
-		
 		Map<String, String> getUser = new HashMap<String, String>();
 		String sql2 = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
 		PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
@@ -104,8 +96,6 @@ public class GetUserCoordinates {
 			statement2.close();
 			DB.disconnect();
 		}
-		
-		log.log(Level.INFO, "User: " + getUser.toString());
 		
 		String sql3 = "SELECT lat, lon FROM Endereco WHERE (id_endereco LIKE ?);";
 		PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);

@@ -45,19 +45,18 @@ public class Rest {
 	
 	@GET
 	@Path("/pharmacy/home/{distance}/{session}")
-	public Response getPharmacies(@PathParam("session") String session, @PathParam("distance") String distance) {
-		log.entering(name, "getPharmacies");
+	public Response getPharmacy(@PathParam("session") String session, @PathParam("distance") String distance) {
+		log.entering(name, "getPharmaciesSession");
 		try {
 			Pharmacies pharmacies = new Pharmacies();
 			JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
 			
-			log.exiting(name, "getPharmacies");
+			log.exiting(name, "getPharmaciesSession");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		log.exiting(name, "getPharmacies");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
@@ -75,7 +74,6 @@ public class Rest {
 			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		log.exiting(name, "getPharmaciesAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
@@ -93,7 +91,6 @@ public class Rest {
 			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		log.exiting(name, "getPharmaciesAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
@@ -111,7 +108,6 @@ public class Rest {
 			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		log.exiting(name, "getPharmacy");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	

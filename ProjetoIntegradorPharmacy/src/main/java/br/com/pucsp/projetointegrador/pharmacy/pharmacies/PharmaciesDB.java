@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONWriter;
@@ -66,7 +65,6 @@ public class PharmaciesDB {
 			DB.disconnect();
 		}
 		
-		log.log(Level.INFO, "Nearby pharmacies getted from DB! payload: " + payload);
 		log.exiting(name, "getPharmacies");
 		return payload;
 	}

@@ -21,7 +21,6 @@ public class PharmacyID {
 		
 		log.exiting(name, "getPharmacy");
 		
-		log.exiting(name, "getPharmacy");
 		return payload;
 	}
 }

@@ -3,7 +3,6 @@ package br.com.pucsp.projetointegrador.pharmacy;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
@@ -39,8 +38,6 @@ public class PharmaciesAnonStreet {
 		        lat = obj.getString("lat");
 		        lon = obj.getString("lon");
 			}
-			
-			log.log(Level.INFO, "User coordinates getted. lat: " + lat + " - lon: " + lon);
 			
 			payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, lat, lon).toString());
 		}

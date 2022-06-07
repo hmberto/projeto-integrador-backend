@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ProjectVariables {
 	public Map<String, String>projectVariables() {
-		String TABLE_CLIENTS = "client";
+		String tableClients = "client";
 		
 		Map <String, String> variables = new HashMap<String, String>();
 		
@@ -22,10 +22,10 @@ public class ProjectVariables {
 		variables.put("EMAIL_PROJETO", System.getenv("EMAIL_PROJETO"));
 		variables.put("SENHA_EMAIL_PROJETO", System.getenv("SENHA_EMAIL_PROJETO"));
 		
-		variables.put("LOGIN_1", "SELECT * FROM " + TABLE_CLIENTS + " WHERE (email LIKE ?) AND (pass LIKE ?);");
-		variables.put("LOGIN_2", "UPDATE " + TABLE_CLIENTS + " SET session_id = ? WHERE (email LIKE ?);");
+		variables.put("LOGIN_1", "SELECT * FROM " + tableClients + " WHERE (email LIKE ?) AND (pass LIKE ?);");
+		variables.put("LOGIN_2", "UPDATE " + tableClients + " SET session_id = ? WHERE (email LIKE ?);");
 		
-		variables.put("SIGNUP", "INSERT INTO " + TABLE_CLIENTS + " (name, email, pass, street, house_number, complement, zip_code, state, city, district, cpf, birth_date, sex, email_confirmation, email_confirmed, lat, lon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+		variables.put("SIGNUP", "INSERT INTO " + tableClients + " (name, email, pass, street, house_number, complement, zip_code, state, city, district, cpf, birth_date, sex, email_confirmation, email_confirmed, lat, lon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 		
 		variables.put("REGEX_NAMES_1", "[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ \\s]+");
 		variables.put("REGEX_NAMES_2", "[0-9A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ . - \\s]+");
