@@ -1,4 +1,4 @@
-package br.com.pucsp.projetointegrador.pharmacy.utils;
+package br.com.pucsp.projetointegrador.order.utils;
 
 public class LogMessage {
 	private LogMessage () {}

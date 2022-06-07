@@ -19,13 +19,14 @@ import br.com.pucsp.projetointegrador.pharmacy.Pharmacies;
 import br.com.pucsp.projetointegrador.pharmacy.PharmaciesAnon;
 import br.com.pucsp.projetointegrador.pharmacy.PharmaciesAnonStreet;
 import br.com.pucsp.projetointegrador.pharmacy.PharmacyID;
+import br.com.pucsp.projetointegrador.pharmacy.utils.LogMessage;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ProjectVariables;
 
 @Produces("application/json")
 @Consumes("application/json")
 public class Rest {
-	public static String NAME = Rest.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(Rest.class.getName());
+	private static String name = Rest.class.getSimpleName();
+	private static Logger log = Logger.getLogger(Rest.class.getName());
 	
 	ProjectVariables projectVariables = new ProjectVariables();
 	Map <String, String> variables = projectVariables.projectVariables();
@@ -34,7 +35,7 @@ public class Rest {
 	
 	@GET
 	@Path("/")
-	public Response getTest() throws Exception {
+	public Response getTest() {
 		String test = "{\n"
 				+ "    \"Hello\":\"World!\"\n"
 				+ "}";
@@ -45,72 +46,72 @@ public class Rest {
 	@GET
 	@Path("/pharmacy/home/{distance}/{session}")
 	public Response getPharmacies(@PathParam("session") String session, @PathParam("distance") String distance) {
-		LOG.entering(NAME, "getPharmacies");
+		log.entering(name, "getPharmacies");
 		try {
 			Pharmacies pharmacies = new Pharmacies();
 			JSONObject payload = pharmacies.getPharmacies(variables, distance, session);
 			
-			LOG.exiting(NAME, "getPharmacies");
+			log.exiting(name, "getPharmacies");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getPharmacies");
+		log.exiting(name, "getPharmacies");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/pharmacy/home/{distance}/{lat}/{lon}")
 	public Response getPharmaciesAnon(@PathParam("lat") String lat, @PathParam("lon") String lon, @PathParam("distance") String distance) {
-		LOG.entering(NAME, "getPharmaciesAnon");
+		log.entering(name, "getPharmaciesAnon");
 		try {
 			PharmaciesAnon pharmacies = new PharmaciesAnon();
 			JSONObject payload = pharmacies.getPharmacies(variables, distance, lat, lon);
 			
-			LOG.exiting(NAME, "getPharmacies");
+			log.exiting(name, "getPharmacies");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getPharmaciesAnon");
+		log.exiting(name, "getPharmaciesAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/pharmacy/home/{distance}/{street}/{district}/{state}/{city}")
 	public Response getPharmaciesAnonStreet(@PathParam("street") String street, @PathParam("district") String district, @PathParam("state") String state, @PathParam("city") String city, @PathParam("distance") String distance) {
-		LOG.entering(NAME, "getPharmaciesAnon");
+		log.entering(name, "getPharmaciesAnon");
 		try {
 			PharmaciesAnonStreet pharmacies = new PharmaciesAnonStreet();
-			JSONObject payload = pharmacies.getPharmacies(variables, distance, street, district, state, city);
+			JSONObject payload = pharmacies.getPharmacies(variables, distance, street);
 			
-			LOG.exiting(NAME, "getPharmacies");
+			log.exiting(name, "getPharmacies");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find pharmacies: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getPharmaciesAnon");
+		log.exiting(name, "getPharmaciesAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/pharmacy/{pharmacyId}")
 	public Response getPharmacy(@PathParam("pharmacyId") String pharmacyId) {
-		LOG.entering(NAME, "getPharmacy");
+		log.entering(name, "getPharmacy");
 		try {
 			PharmacyID pharmacyID = new PharmacyID();
 			JSONObject payload = pharmacyID.getPharmacy(variables, pharmacyId);
 			
-			LOG.exiting(NAME, "getPharmacy");
+			log.exiting(name, "getPharmacy");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find pharmacy: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getPharmacy");
+		log.exiting(name, "getPharmacy");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	

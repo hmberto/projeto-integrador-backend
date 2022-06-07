@@ -2,7 +2,10 @@ package br.com.pucsp.projetointegrador.order.get;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,17 +15,19 @@ import org.json.JSONObject;
 import org.json.JSONWriter;
 
 import br.com.pucsp.projetointegrador.order.db.DB;
+import br.com.pucsp.projetointegrador.order.utils.LogMessage;
 
 public class GetOrdersDB {
-	public static String NAME = GetOrdersDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetOrdersDB.class.getName());
+	private static String name = GetOrdersDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetOrdersDB.class.getName());
 	
 	List<Float> productsPrice = new ArrayList<Float>();
 
-	public StringBuffer getOrders(Map<String, String> variables, String session, PreparedStatement statementOrders) {
-		LOG.entering(NAME, "getOrders");
+	public StringBuilder getOrders(Map<String, String> variables, PreparedStatement statementOrders) {
+		String methodName = "getOrders";
+		log.entering(name, methodName);
 		
-		StringBuffer payload = new StringBuffer();
+		StringBuilder payload = new StringBuilder();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
 		float totalProdutos = 0;
@@ -54,71 +59,54 @@ public class GetOrdersDB {
 				createPayload.key("idFarmacia").value(orders.getString(7));
 				
 				String sqlPharmacy = "SELECT nome,cnpj FROM Farmacia WHERE (id_farmacia LIKE ?);";
-				PreparedStatement statementPharmacy = DB.connect(variables).prepareStatement(sqlPharmacy);
-				statementPharmacy.setString(1, orders.getString(7));
-								
-				ResultSet pharmacy = statementPharmacy.executeQuery();
-				while(pharmacy.next()) {
-					createPayload.key("nomeFarmacia").value(pharmacy.getString(1));
-					createPayload.key("cnpjFarmacia").value(pharmacy.getString(2));
-				}
-				statementPharmacy.close();
+				List<String> propertiesPharmacy = new ArrayList<String>();
+				propertiesPharmacy.add(orders.getString(7));
+				Map<String, String> pharmacy = getFromDB(variables, sqlPharmacy, propertiesPharmacy);
+				
+				createPayload.key("nomeFarmacia").value(pharmacy.get("nome"));
+				createPayload.key("cnpjFarmacia").value(pharmacy.get("cnpj"));
 				
 				String sqlDelivery = "SELECT valor_entrega,data_entrega FROM Entrega WHERE (id_entrega LIKE ?);";
-				PreparedStatement statementDelivery = DB.connect(variables).prepareStatement(sqlDelivery);
-				statementDelivery.setString(1, orders.getString(8));
-								
-				ResultSet delivery = statementDelivery.executeQuery();
-				while(delivery.next()) {
-					createPayload.key("valorEntrega").value(delivery.getString(1).replace(".", ","));
-					createPayload.key("totalPedido").value(String.format("%.2f", totalProdutos + Float.parseFloat(delivery.getString(1))).replace(".", ","));
-					createPayload.key("dataEntrega").value(delivery.getString(2));
-				}
-				statementDelivery.close();
+				List<String> propertiesDelivery = new ArrayList<String>();
+				propertiesDelivery.add(orders.getString(8));
+				Map<String, String> delivery = getFromDB(variables, sqlDelivery, propertiesDelivery);
+				
+				createPayload.key("valorEntrega").value(delivery.get("valor_entrega").replace(".", ","));
+				createPayload.key("totalPedido").value(String.format("%.2f", totalProdutos + Float.parseFloat(delivery.get("valor_entrega"))).replace(".", ","));
+				createPayload.key("dataEntrega").value(delivery.get("data_entrega"));
 				
 				String sqlStatus = "SELECT nome FROM Status WHERE (id_status LIKE ?);";
-				PreparedStatement statementStatus = DB.connect(variables).prepareStatement(sqlStatus);
-				statementStatus.setString(1, orders.getString(10));
-								
-				ResultSet status = statementStatus.executeQuery();
-				while(status.next()) {
-					createPayload.key("status").value(status.getString(1));
-				}
-				statementStatus.close();
+				List<String> propertiesStatus = new ArrayList<String>();
+				propertiesStatus.add(orders.getString(10));
+				Map<String, String> status = getFromDB(variables, sqlStatus, propertiesStatus);
+				
+				createPayload.key("status").value(status.get("nome"));
 				
 				String sqlPayment = "SELECT id_cartao FROM Forma_Pagamento WHERE (id_forma_pagamento LIKE ?);";
-				PreparedStatement statementPayment = DB.connect(variables).prepareStatement(sqlPayment);
-				statementPayment.setString(1, orders.getString(9));
-								
-				ResultSet payment = statementPayment.executeQuery();
-				while(payment.next()) {
-					String sqlCard = "SELECT numero,id_bandeira FROM Cartao WHERE (id_cartao LIKE ?);";
-					PreparedStatement statementCard = DB.connect(variables).prepareStatement(sqlCard);
-					statementCard.setString(1, payment.getString(1));
-									
-					ResultSet card = statementCard.executeQuery();
-					while(card.next()) {
-						List<String> cardNum = new ArrayList<String>();
-						
-						for (int i = 0; i < card.getString(1).length(); i += 4) {
-							cardNum.add(card.getString(1).substring(i, Math.min(i + 4,card.getString(1).length())));
-						}
-						
-						createPayload.key("numeroCartao").value("**** " + cardNum.get(3));
-						
-						String sqlFlag = "SELECT nome FROM Bandeira_Cartao WHERE (id_bandeira LIKE ?);";
-						PreparedStatement statementFlag = DB.connect(variables).prepareStatement(sqlFlag);
-						statementFlag.setString(1, card.getString(2));
-										
-						ResultSet flag = statementFlag.executeQuery();
-						while(flag.next()) {
-							createPayload.key("bandeiraCartao").value(flag.getString(1));
-						}
-						statementFlag.close();
-					}
-					statementCard.close();
+				List<String> propertiesPayment = new ArrayList<String>();
+				propertiesPayment.add(orders.getString(9));
+				Map<String, String> payment = getFromDB(variables, sqlPayment, propertiesPayment);
+				
+				String sqlCard = "SELECT numero,id_bandeira FROM Cartao WHERE (id_cartao LIKE ?);";
+				List<String> propertiesCard = new ArrayList<String>();
+				propertiesCard.add(payment.get("id_cartao"));
+				Map<String, String> card = getFromDB(variables, sqlCard, propertiesCard);
+				
+				List<String> cardNum = new ArrayList<String>();
+				
+				String cardNumber = card.get("numero");
+				for (int i = 0; i < cardNumber.length(); i += 4) {
+					cardNum.add(cardNumber.substring(i, Math.min(i + 4,cardNumber.length())));
 				}
-				statementPayment.close();
+				
+				createPayload.key("numeroCartao").value("**** " + cardNum.get(3));
+				
+				String sqlFlag = "SELECT nome FROM Bandeira_Cartao WHERE (id_bandeira LIKE ?);";
+				List<String> propertiesFlag = new ArrayList<String>();
+				propertiesFlag.add(card.get("id_bandeira"));
+				Map<String, String> flag = getFromDB(variables, sqlFlag, propertiesFlag);
+				
+				createPayload.key("bandeiraCartao").value(flag.get("nome"));
 				
 				createPayload.endObject();
 			}
@@ -128,26 +116,62 @@ public class GetOrdersDB {
 			createPayload.endObject();
 		}
 		catch (Exception e) {
-			LOG.log(Level.SEVERE, "Orders not getted from the database: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		finally {
 			DB.disconnect();
 		}
-
-		LOG.log(Level.INFO, "Orders: " + payload);
-		LOG.exiting(NAME, "getOrders");
+		
+		log.exiting(name, methodName);
 		return payload;
 	}
 	
-	public JSONObject getOrdersProducts(Map<String, String> variables, String orderId, String pharmacyId) {
-		LOG.entering(NAME, "getOrdersProducts");
+	public Map<String, String> getFromDB(Map<String, String> variables, String sqlString, List<String> propertie) throws SQLException {
+		String methodName = "getFromDB";
+		log.entering(name, methodName);
 		
-		StringBuffer payload = new StringBuffer();
-		JSONWriter createPayload = new JSONWriter(payload);
+		Map<String, String> data = new HashMap<String, String>();
+		
+		PreparedStatement statementY = DB.connect(variables).prepareStatement(sqlString);
 		
 		try {
-			String sqlProducts = "SELECT quantidade,valor_total_compra_itens,id_produto_farmacia FROM Compra_Itens WHERE (id_compra LIKE ?);";
-			PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
+			for(int i = 0; i < propertie.size(); i++) {
+				statementY.setString(i+1, propertie.get(i));
+			}
+			
+			ResultSet g = statementY.executeQuery();
+			ResultSetMetaData h = g.getMetaData();
+			int columnCount = h.getColumnCount();
+			
+			while(g.next()) {
+				for (int i = 1; i <= columnCount; i++) {
+					data.put(h.getColumnName(i), g.getString(i));
+				}
+			}
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statementY.close();
+		}
+		
+		log.exiting(name, methodName);
+		return data;
+	}
+	
+	public JSONObject getOrdersProducts(Map<String, String> variables, String orderId, String pharmacyId) throws SQLException {
+		String methodName = "getOrdersProducts";
+		
+		log.entering(name, methodName);
+		
+		StringBuilder payload = new StringBuilder();
+		JSONWriter createPayload = new JSONWriter(payload);
+		
+		String sqlProducts = "SELECT quantidade,valor_total_compra_itens,id_produto_farmacia FROM Compra_Itens WHERE (id_compra LIKE ?);";
+		PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
+		
+		try {
 			statementProducts.setString(1, orderId);
 			
 			createPayload.object();
@@ -163,43 +187,35 @@ public class GetOrdersDB {
 				createPayload.key("valorTotalItem").value(String.format("%.2f", Float.parseFloat(orders.getString(2))).replace(".", ","));
 				
 				String sqlProductP = "SELECT id_produto FROM Produto_Farmacia WHERE (id_produto_farmacia LIKE ?);";
-				PreparedStatement statementProductP = DB.connect(variables).prepareStatement(sqlProductP);
-				statementProductP.setString(1, orders.getString(3));
+				List<String> propertiesProductP = new ArrayList<String>();
+				propertiesProductP.add(orders.getString(3));
+				
+				Map<String, String> productP = getFromDB(variables, sqlProductP, propertiesProductP);
 				
 				String newProductId = "";
-				ResultSet productP = statementProductP.executeQuery();
 				
-				while(productP.next()) {
-					newProductId = productP.getString(1);
-					createPayload.key("idProduto").value(productP.getString(1));
-				}
-				statementProductP.close();
+				newProductId = productP.get("id_produto");
+				createPayload.key("idProduto").value(productP.get("id_produto"));
 				
 				String sqlProduct = "SELECT nome,amount,image,description FROM Produto WHERE (id_produto LIKE ?);";
-				PreparedStatement statementProduct = DB.connect(variables).prepareStatement(sqlProduct);
-				statementProduct.setString(1, newProductId);
-											
-				ResultSet product = statementProduct.executeQuery();
+				List<String> propertiesProduct = new ArrayList<String>();
+				propertiesProduct.add(newProductId);
 				
-				while(product.next()) {
-					createPayload.key("nomeProduto").value(product.getString(1));
-					createPayload.key("amountProduto").value(product.getString(2));
-					createPayload.key("imageProduto").value(product.getString(3));
-					createPayload.key("descriptionProduto").value(product.getString(4));
-				}
-				statementProduct.close();
+				Map<String, String> product = getFromDB(variables, sqlProduct, propertiesProduct);
+				
+				createPayload.key("nomeProduto").value(product.get("nome"));
+				createPayload.key("amountProduto").value(product.get("amount"));
+				createPayload.key("imageProduto").value(product.get("image"));
+				createPayload.key("descriptionProduto").value(product.get("description"));
 				
 				String sqlProductPharmacy = "SELECT valor_unitario FROM Produto_Farmacia WHERE (id_produto LIKE ?) AND (id_farmacia LIKE ?);";
-				PreparedStatement statementProductPharmacy = DB.connect(variables).prepareStatement(sqlProductPharmacy);
-				statementProductPharmacy.setString(1, newProductId);
-				statementProductPharmacy.setString(2, pharmacyId);
+				List<String> propertiesProductPharmacy = new ArrayList<String>();
+				propertiesProductPharmacy.add(newProductId);
+				propertiesProductPharmacy.add(pharmacyId);
 				
-				ResultSet productPharmacy = statementProductPharmacy.executeQuery();
+				Map<String, String> productPharmacy = getFromDB(variables, sqlProductPharmacy, propertiesProductPharmacy);
 				
-				while(productPharmacy.next()) {
-					createPayload.key("valorUnitarioProduto").value(String.format("%.2f", Float.parseFloat(productPharmacy.getString(1))).replace(".", ","));
-				}
-				statementProductPharmacy.close();
+				createPayload.key("valorUnitarioProduto").value(String.format("%.2f", Float.parseFloat(productPharmacy.get("valor_unitario"))).replace(".", ","));
 				
 				productsPrice.add(Float.parseFloat(orders.getString(2)));
 				
@@ -210,16 +226,17 @@ public class GetOrdersDB {
 			
 			createPayload.endObject();
 			
-			LOG.log(Level.INFO, "Products: " + payload);
-			LOG.exiting(NAME, "getOrdersProducts");
-			
 			statementProducts.close();
+			
+			JSONObject products = new JSONObject(payload.toString());
+			log.exiting(name, methodName);
+			return products;
 		}
 		catch (Exception e) {
-			LOG.log(Level.SEVERE, "Products not getted from the database: " + e);
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
-		
-		JSONObject products = new JSONObject(payload.toString());
-		return products;
+		finally {
+			statementProducts.close();
+		}
 	}
 }

@@ -14,6 +14,7 @@ import br.com.pucsp.projetointegrador.pharmacy.utils.CalcFeeDelivery;
 import br.com.pucsp.projetointegrador.pharmacy.utils.CalcTimeDelivery;
 import br.com.pucsp.projetointegrador.pharmacy.utils.LogMessage;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ReplaceImageNames;
+import br.com.pucsp.projetointegrador.pharmacy.utils.SQLPharmacies;
 
 public class PharmaciesDB {
 	private static String name = PharmaciesDB.class.getSimpleName();
@@ -25,15 +26,7 @@ public class PharmaciesDB {
 		StringBuilder payload = new StringBuilder();
 		JSONWriter createPayload = new JSONWriter(payload);
 		
-		String sql = "SELECT Farmacia.nome, Farmacia.id_farmacia, (6371 *\n"
-				+ "        acos(\n"
-				+ "            cos(radians(" + lat + ")) *\n"
-				+ "            cos(radians(lat)) *\n"
-				+ "            cos(radians(" + lon + ") - radians(lon)) +\n"
-				+ "            sin(radians(" + lat + ")) *\n"
-				+ "            sin(radians(lat))\n"
-				+ "        )) AS distance\n"
-				+ "FROM Endereco, Farmacia WHERE Endereco.id_endereco = Farmacia.id_endereco HAVING distance <= " + distance + ";";
+		String sql = SQLPharmacies.sql(lat, lon, distance);
 		
 		PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 		

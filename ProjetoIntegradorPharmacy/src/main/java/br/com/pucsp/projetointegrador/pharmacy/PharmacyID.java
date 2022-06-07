@@ -10,18 +10,18 @@ import org.json.JSONObject;
 import br.com.pucsp.projetointegrador.pharmacy.pharmacies.PharmacyDB;
 
 public class PharmacyID {
-	public static String NAME = PharmacyID.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(PharmacyID.class.getName());
+	private static String name = PharmacyID.class.getSimpleName();
+	private static Logger log = Logger.getLogger(PharmacyID.class.getName());
 	
 	public JSONObject getPharmacy(Map <String, String> variables, String pharmacyId) throws JSONException, SQLException {
-		LOG.entering(NAME, "getPharmacy");
+		log.entering(name, "getPharmacy");
 		
 		PharmacyDB pharmacy = new PharmacyDB();
 		JSONObject payload = new JSONObject(pharmacy.getPharmacy(variables, pharmacyId).toString());
 		
-		LOG.exiting(NAME, "getPharmacy");
+		log.exiting(name, "getPharmacy");
 		
-		LOG.exiting(NAME, "getPharmacy");
+		log.exiting(name, "getPharmacy");
 		return payload;
 	}
 }

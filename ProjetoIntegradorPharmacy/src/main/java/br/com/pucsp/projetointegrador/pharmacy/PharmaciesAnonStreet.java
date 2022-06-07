@@ -14,11 +14,11 @@ import br.com.pucsp.projetointegrador.pharmacy.pharmacies.PharmaciesDB;
 import br.com.pucsp.projetointegrador.pharmacy.utils.GetUserCoordinates;
 
 public class PharmaciesAnonStreet {
-	public static String NAME = PharmaciesAnonStreet.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(PharmaciesAnonStreet.class.getName());
+	private static String name = PharmaciesAnonStreet.class.getSimpleName();
+	private static Logger log = Logger.getLogger(PharmaciesAnonStreet.class.getName());
 	
-	public JSONObject getPharmacies(Map <String, String> variables, String distance, String street, String district, String state, String city) throws IOException, JSONException, SQLException {
-		LOG.entering(NAME, "getPharmacies");
+	public JSONObject getPharmacies(Map <String, String> variables, String distance, String street) throws IOException, JSONException, SQLException {
+		log.entering(name, "getPharmacies");
 		
 		PharmaciesDB pharmaciesDB = new PharmaciesDB();
 		
@@ -40,12 +40,12 @@ public class PharmaciesAnonStreet {
 		        lon = obj.getString("lon");
 			}
 			
-			LOG.log(Level.INFO, "User coordinates getted. lat: " + lat + " - lon: " + lon);
+			log.log(Level.INFO, "User coordinates getted. lat: " + lat + " - lon: " + lon);
 			
 			payload = new JSONObject(pharmaciesDB.getPharmacies(variables, distance, lat, lon).toString());
 		}
 		
-		LOG.exiting(NAME, "getPharmacies");
+		log.exiting(name, "getPharmacies");
 		return payload;
 	}
 }

@@ -16,27 +16,27 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.product.Products;
-import br.com.pucsp.projetointegrador.product.ProductsAnon;
-import br.com.pucsp.projetointegrador.product.ProductsAnonStreet;
-import br.com.pucsp.projetointegrador.product.SearchProducts;
-import br.com.pucsp.projetointegrador.product.SearchProductsAnon;
-import br.com.pucsp.projetointegrador.product.SearchProductsAnonStreet;
+import br.com.pucsp.projetointegrador.product.utils.GetUserCoordinates;
+import br.com.pucsp.projetointegrador.product.utils.LogMessage;
 import br.com.pucsp.projetointegrador.product.utils.ProjectVariables;
+import br.com.pucsp.projetointegrador.product.utils.SQLProducts;
 
 @Produces("application/json")
 @Consumes("application/json")
 public class Rest {
-	public static String NAME = Rest.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(Rest.class.getName());
+	private static String name = Rest.class.getSimpleName();
+	private static Logger log = Logger.getLogger(Rest.class.getName());
 	
 	ProjectVariables projectVariables = new ProjectVariables();
 	Map <String, String> variables = projectVariables.projectVariables();
+	
+	int sessionLength = Integer.parseInt(variables.get("SESSION_LENGTH"));
 	
 	URI uri = URI.create("https://projeto-integrador-frontend.herokuapp.com");
 	
 	@GET
 	@Path("/")
-	public Response getTest() throws Exception {
+	public Response getTest() {
 		String test = "{\n"
 				+ "    \"Hello\":\"World!\"\n"
 				+ "}";
@@ -47,108 +47,140 @@ public class Rest {
 	@GET
 	@Path("/product/all-products/{distance}/{session}")
 	public Response getProducts(@PathParam("session") String session, @PathParam("distance") String distance) {
-		LOG.entering(NAME, "getProducts");
-		try {
-			Products products = new Products();
-			JSONObject payload = products.getProducts(variables, distance, session);
-			
-			LOG.exiting(NAME, "getProducts");
-			return Response.ok(payload.toString()).build();
-		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
-		}
+		log.entering(name, "getProducts");
 		
-		LOG.exiting(NAME, "getProducts");
+		if(session.length() == sessionLength) {
+			try {
+				GetUserCoordinates getUserCoordinates = new GetUserCoordinates();
+				Map<String, String> getAddress = getUserCoordinates.coordinatesFromDB(variables, session);
+				
+				String sql1 = SQLProducts.products(getAddress.get("lat"), getAddress.get("lon"), distance);
+				
+				String sqlProduct = SQLProducts.productsIn();
+				
+				Products products = new Products();
+				JSONObject payload = products.getProducts(variables, sql1, sqlProduct);
+				
+				log.exiting(name, "getProducts");
+				return Response.ok(payload.toString()).build();
+			}
+			catch (Exception e) {
+				log.log(Level.SEVERE, LogMessage.productsMessage(e.toString()));
+			}
+		}
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/product/all-products/{distance}/{lat}/{lon}")
 	public Response getProductsAnon(@PathParam("lat") String lat, @PathParam("lon") String lon, @PathParam("distance") String distance) {
-		LOG.entering(NAME, "getProductsAnon");
+		log.entering(name, "getProductsAnon");
 		try {
-			ProductsAnon products = new ProductsAnon();
-			JSONObject payload = products.getProducts(variables, distance, lat, lon);
+			String sql2 = SQLProducts.products(lat, lon, distance);
 			
-			LOG.exiting(NAME, "getProductsAnon");
+			String sqlProduct = SQLProducts.productsIn();
+			
+			Products products = new Products();
+			JSONObject payload = products.getProducts(variables, sql2, sqlProduct);
+			
+			log.exiting(name, "getProductsAnon");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+			log.log(Level.SEVERE, LogMessage.productsMessage(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getProductsAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/product/all-products/{distance}/{street}/{district}/{state}/{city}")
 	public Response getProductsAnonStreet(@PathParam("street") String street, @PathParam("district") String district, @PathParam("state") String state, @PathParam("city") String city, @PathParam("distance") String distance) {
-		LOG.entering(NAME, "getProductsAnonStreet");
+		log.entering(name, "getProductsAnonStreet");
 		try {
-			ProductsAnonStreet products = new ProductsAnonStreet();
-			JSONObject payload = products.getProducts(variables, distance, street, district, state, city);
+			SQLProducts sqlProductsAnonStreet = new SQLProducts();
+			String sql3 = sqlProductsAnonStreet.productsAnonStreet(distance, street);
 			
-			LOG.exiting(NAME, "getPharmacies");
+			String sqlProduct = SQLProducts.productsIn();
+			
+			Products products = new Products();
+			JSONObject payload = products.getProducts(variables, sql3, sqlProduct);
+			
+			log.exiting(name, "getPharmacies");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+			log.log(Level.SEVERE, LogMessage.productsMessage(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getProductsAnonStreet");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/product/search/{distance}/{session}/{productName}")
 	public Response getProductsSearch(@PathParam("session") String session, @PathParam("distance") String distance, @PathParam("productName") String productName) {
-		LOG.entering(NAME, "getProductsSearch");
-		try {
-			SearchProducts searchProducts = new SearchProducts();
-			JSONObject payload = searchProducts.getProducts(variables, distance, session, productName);
-			
-			LOG.exiting(NAME, "getProductsSearch");
-			return Response.ok(payload.toString()).build();
-		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+		log.entering(name, "getProductsSearch");
+		
+		if(session.length() == sessionLength) {
+			try {
+				GetUserCoordinates getUserCoordinates = new GetUserCoordinates();
+				Map<String, String> getAddress = getUserCoordinates.coordinatesFromDB(variables, session);
+				
+				String sql4 = SQLProducts.products(getAddress.get("lat"), getAddress.get("lon"), distance);
+				
+				String sqlProduct = SQLProducts.productsInSearch(productName);
+				
+				Products products = new Products();
+				JSONObject payload = products.getProducts(variables, sql4, sqlProduct);
+				
+				log.exiting(name, "getProductsSearch");
+				return Response.ok(payload.toString()).build();
+			} catch (Exception e) {
+				log.log(Level.SEVERE, LogMessage.productsMessage(e.toString()));
+			}
 		}
 		
-		LOG.exiting(NAME, "getProductsSearch");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/product/search/{distance}/{lat}/{lon}/{productName}")
 	public Response getProductsSearchAnon(@PathParam("lat") String lat, @PathParam("lon") String lon, @PathParam("distance") String distance, @PathParam("productName") String productName) {
-		LOG.entering(NAME, "getProductsSearchAnon");
+		log.entering(name, "getProductsSearchAnon");
 		try {
-			SearchProductsAnon products = new SearchProductsAnon();
-			JSONObject payload = products.getProducts(variables, distance, lat, lon, productName);
+			String sql5 = SQLProducts.products(lat, lon, distance);
 			
-			LOG.exiting(NAME, "getProductsSearchAnon");
+			String sqlProduct = SQLProducts.productsInSearch(productName);
+			
+			Products products = new Products();
+			JSONObject payload = products.getProducts(variables, sql5, sqlProduct);
+			
+			log.exiting(name, "getProductsSearchAnon");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+			log.log(Level.SEVERE, LogMessage.productsMessage(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getProductsSearchAnon");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/product/search/{distance}/{street}/{district}/{state}/{city}/{productName}")
 	public Response getProductsSearchStreet(@PathParam("street") String street, @PathParam("district") String district, @PathParam("state") String state, @PathParam("city") String city, @PathParam("distance") String distance, @PathParam("productName") String productName) {
-		LOG.entering(NAME, "getProductsSearchStreet");
+		log.entering(name, "getProductsSearchStreet");
 		try {
-			SearchProductsAnonStreet products = new SearchProductsAnonStreet();
-			JSONObject payload = products.getProducts(variables, distance, street, district, state, city, productName);
+			SQLProducts sqlProductsAnonStreet = new SQLProducts();
+			String sql6 = sqlProductsAnonStreet.productsAnonStreet(distance, street);
 			
-			LOG.exiting(NAME, "getProductsSearchStreet");
+			String sqlProduct = SQLProducts.productsInSearch(productName);
+			
+			Products products = new Products();
+			JSONObject payload = products.getProducts(variables, sql6, sqlProduct);
+			
+			log.exiting(name, "getProductsSearchStreet");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+			log.log(Level.SEVERE, LogMessage.productsMessage(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getProductsSearchStreet");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	

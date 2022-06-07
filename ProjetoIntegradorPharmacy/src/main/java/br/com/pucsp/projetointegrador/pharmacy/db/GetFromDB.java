@@ -9,11 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GetFromDB {
-	public static String NAME = GetFromDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetFromDB.class.getName());
+	private static String name = GetFromDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetFromDB.class.getName());
 	
-	public Map<String, String> getFromDB(Map<String, String> variables, PreparedStatement statement) {
-		LOG.entering(NAME, "getFromDB");
+	public Map<String, String> getFromDB(PreparedStatement statement) {
+		log.entering(name, "getFromDB");
 		
 		try {
 			Map<String, String> data = new HashMap<String, String>();
@@ -30,18 +30,18 @@ public class GetFromDB {
 			
 			statement.close();
 			
-			LOG.log(Level.INFO, "Data getted from DB! SQL: " + statement);
-			LOG.exiting(NAME, "getUser");
+			log.log(Level.INFO, "Data getted from DB! SQL: " + statement);
+			log.exiting(name, "getUser");
 			return data;
 		}
 		catch (Exception e) {
-			LOG.log(Level.SEVERE, "GetFromDB.getFromDB: " + e);
+			log.log(Level.SEVERE, "GetFromDB.getFromDB: " + e);
 		}
 		finally {
 			DB.disconnect();
 		}
 		
-		LOG.exiting(NAME, "getFromDB");
+		log.exiting(name, "getFromDB");
 		return null;
 	}
 }

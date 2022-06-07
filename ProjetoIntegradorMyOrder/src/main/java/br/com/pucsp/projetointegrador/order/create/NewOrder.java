@@ -117,5 +117,5 @@ public class NewOrder {
 	String pharmacyCnpj;
 	String pharmacyId;
 	
-	public NewOrder() {}
+	private NewOrder() {}
 }

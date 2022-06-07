@@ -74,7 +74,7 @@ public class GetUserCoordinates {
 		try {
 			statement1.setString(1, session);
 			
-			getLoginSession = getFromDB.getFromDB(variables, statement1);
+			getLoginSession = getFromDB.getFromDB(statement1);
 		}
 		catch (SQLException e) {
 			throw new SQLException(LogMessage.message(e.toString()));
@@ -93,7 +93,7 @@ public class GetUserCoordinates {
 		try {
 			statement2.setString(1, getLoginSession.get("id_usuario"));
 			
-			getUser = getFromDB.getFromDB(variables, statement2);
+			getUser = getFromDB.getFromDB(statement2);
 		}
 		catch (SQLException e) {
 			throw new SQLException(LogMessage.message(e.toString()));
@@ -111,7 +111,7 @@ public class GetUserCoordinates {
 		try {
 			statement3.setString(1, getUser.get("id_endereco"));
 			
-			return getFromDB.getFromDB(variables, statement3);
+			return getFromDB.getFromDB(statement3);
 		}
 		catch (SQLException e) {
 			throw new SQLException(LogMessage.message(e.toString()));

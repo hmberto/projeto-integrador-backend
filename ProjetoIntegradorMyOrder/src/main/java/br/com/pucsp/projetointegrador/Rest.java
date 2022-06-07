@@ -22,13 +22,14 @@ import br.com.pucsp.projetointegrador.order.GetOrders;
 import br.com.pucsp.projetointegrador.order.Products;
 import br.com.pucsp.projetointegrador.order.create.NewOrder;
 import br.com.pucsp.projetointegrador.order.products.GetProducts;
+import br.com.pucsp.projetointegrador.order.utils.LogMessage;
 import br.com.pucsp.projetointegrador.order.utils.ProjectVariables;
 
 @Produces("application/json")
 @Consumes("application/json")
 public class Rest {
-	public static String NAME = Rest.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(Rest.class.getName());
+	private static String name = Rest.class.getSimpleName();
+	private static Logger log = Logger.getLogger(Rest.class.getName());
 	
 	ProjectVariables projectVariables = new ProjectVariables();
 	Map <String, String> variables = projectVariables.projectVariables();
@@ -37,7 +38,7 @@ public class Rest {
 	
 	@GET
 	@Path("/")
-	public Response getTest() throws Exception {
+	public Response getTest() {
 		String test = "{\n"
 				+ "    \"Hello\":\"World!\"\n"
 				+ "}";
@@ -48,72 +49,68 @@ public class Rest {
 	@POST
 	@Path("/validate")
 	public Response getProducts(GetProducts cart) {
-		LOG.entering(NAME, "getProducts");
+		log.entering(name, "getProducts");
 		try {
 			Products products = new Products();
 			JSONObject payload = products.getProducts(variables, cart);
 			
-			LOG.exiting(NAME, "getProducts");
+			log.exiting(name, "getProducts");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find products: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getProducts");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@POST
 	@Path("/order/complete")
 	public Response createOrder(NewOrder order) {
-		LOG.entering(NAME, "createOrder");
+		log.entering(name, "createOrder");
 		try {
 			CreateOrder createOrder = new CreateOrder();
 			JSONObject payload = createOrder.createOrder(variables, order);
 			
-			LOG.exiting(NAME, "createOrder");
+			log.exiting(name, "createOrder");
 			return Response.ok(payload.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't create order: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "createOrder");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/orders/{session}")
 	public Response getOrders(@PathParam("session") String session) {
-		LOG.entering(NAME, "getOrders");
+		log.entering(name, "getOrders");
 		try {
 			GetOrders getOrders = new GetOrders();
 			JSONObject orders = getOrders.getOrders(variables, session);
 			
-			LOG.exiting(NAME, "getOrders");
+			log.exiting(name, "getOrders");
 			return Response.ok(orders.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find orders: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getOrders");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/orders/{orderId}/{session}")
 	public Response getOrder(@PathParam("session") String session, @PathParam("orderId") String orderId) {
-		LOG.entering(NAME, "getOrder");
+		log.entering(name, "getOrder");
 		try {
 			GetOrder getOrder = new GetOrder();
 			JSONObject orders = getOrder.getOrder(variables, orderId, session);
 			
-			LOG.exiting(NAME, "getOrder");
+			log.exiting(name, "getOrder");
 			return Response.ok(orders.toString()).build();
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't find order: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "getOrder");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	

@@ -8,12 +8,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import br.com.pucsp.projetointegrador.order.utils.LogMessage;
+
 public class GetFromDB {
-	public static String NAME = GetFromDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetFromDB.class.getName());
+	private static String name = GetFromDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetFromDB.class.getName());
 	
-	public Map<String, String> getFromDB(Map<String, String> variables, PreparedStatement statement) {
-		LOG.entering(NAME, "getFromDB");
+	public Map<String, String> getFromDB(PreparedStatement statement) {
+		String methodName = "getFromDB";
+		log.entering(name, methodName);
 		
 		try {
 			Map<String, String> data = new HashMap<String, String>();
@@ -30,18 +33,16 @@ public class GetFromDB {
 			
 			statement.close();
 			
-			LOG.log(Level.INFO, "Data getted from DB! SQL: " + statement);
-			LOG.exiting(NAME, "getUser");
+			log.exiting(name, methodName);
 			return data;
 		}
 		catch (Exception e) {
-			LOG.log(Level.SEVERE, "GetFromDB.getFromDB: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		finally {
 			DB.disconnect();
 		}
 		
-		LOG.exiting(NAME, "getFromDB");
 		return null;
 	}
 }

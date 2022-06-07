@@ -1,5 +1,6 @@
 package br.com.pucsp.projetointegrador.order;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -9,17 +10,17 @@ import br.com.pucsp.projetointegrador.order.create.CreateOrderDB;
 import br.com.pucsp.projetointegrador.order.create.NewOrder;
 
 public class CreateOrder {
-	public static String NAME = Products.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(Products.class.getName());
+	private static String name = CreateOrder.class.getSimpleName();
+	private static Logger log = Logger.getLogger(CreateOrder.class.getName());
 	
-	public JSONObject createOrder(Map <String, String> variables, NewOrder order) {
-		LOG.entering(NAME, "createOrder");
+	public JSONObject createOrder(Map <String, String> variables, NewOrder order) throws SQLException {
+		log.entering(name, "createOrder");
 		
 		CreateOrderDB createOrderDB = new CreateOrderDB();
 		
 		JSONObject payload = new JSONObject(createOrderDB.createOrder(variables, order).toString());
 		
-		LOG.exiting(NAME, "createOrder");
+		log.exiting(name, "createOrder");
 		return payload;
 	}
 }

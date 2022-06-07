@@ -23,7 +23,8 @@ public class GetUserCoordinates {
 	GetFromDB getFromDB = new GetFromDB();
 	
 	public String coordinates(String street, String number) throws IOException {
-		log.entering(name, "coordinates");
+		String methodName = "coordinates";
+		log.entering(name, methodName);
 		String[] streetSplit= street.split(" ");
 		
 		StringBuilder address = new StringBuilder();
@@ -60,12 +61,13 @@ public class GetUserCoordinates {
         conn.disconnect();
 		
 		log.log(Level.INFO, "User coordinates getted: " + output.toString());
-		log.exiting(name, "coordinates");
+		log.exiting(name, methodName);
 		return output.toString();
 	}
 		
 	public Map<String, String> coordinatesFromDB(Map <String, String> variables, String session) throws SQLException {
-		log.entering(name, "coordinatesFromDB");
+		String methodName = "coordinatesFromDB";
+		log.entering(name, methodName);
 		
 		Map<String, String> getLoginSession = new HashMap<String, String>();
 		String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
@@ -74,7 +76,7 @@ public class GetUserCoordinates {
 		try {
 			statement1.setString(1, session);
 			
-			getLoginSession = getFromDB.getFromDB(variables, statement1);
+			getLoginSession = getFromDB.getFromDB(statement1);
 		}
 		catch (SQLException e) {
 			throw new SQLException(LogMessage.message(e.toString()));
@@ -93,7 +95,7 @@ public class GetUserCoordinates {
 		try {
 			statement2.setString(1, getLoginSession.get("id_usuario"));
 			
-			getUser = getFromDB.getFromDB(variables, statement2);
+			getUser = getFromDB.getFromDB(statement2);
 		}
 		catch (SQLException e) {
 			throw new SQLException(LogMessage.message(e.toString()));
@@ -111,8 +113,8 @@ public class GetUserCoordinates {
 		try {
 			statement3.setString(1, getUser.get("id_endereco"));
 			
-			log.exiting(name, "coordinates");
-			return getFromDB.getFromDB(variables, statement3);
+			log.exiting(name, methodName);
+			return getFromDB.getFromDB(statement3);
 		}
 		catch (SQLException e) {
 			throw new SQLException(LogMessage.message(e.toString()));

@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import br.com.pucsp.projetointegrador.product.db.DB;
 
 public class GetPharmaciesID {
-	private static String name = GetAllProducts.class.getSimpleName();
-	private static Logger log = Logger.getLogger(GetAllProducts.class.getName());
+	private static String name = GetPharmaciesID.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetPharmaciesID.class.getName());
 	
 	public List<String> pharmaciesID(Map <String, String> variables, String sql) throws SQLException {
 		log.entering(name, "products");

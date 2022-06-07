@@ -37,5 +37,5 @@ public class GetProducts {
 	String distance;
 	String pharmacyName;
 	
-	public GetProducts() {}
+	private GetProducts() {}
 }

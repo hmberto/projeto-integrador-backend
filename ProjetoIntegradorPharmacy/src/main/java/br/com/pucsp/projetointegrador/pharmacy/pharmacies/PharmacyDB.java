@@ -16,6 +16,7 @@ import br.com.pucsp.projetointegrador.pharmacy.db.DB;
 import br.com.pucsp.projetointegrador.pharmacy.db.GetFromDB;
 import br.com.pucsp.projetointegrador.pharmacy.utils.LogMessage;
 import br.com.pucsp.projetointegrador.pharmacy.utils.ReplaceImageNames;
+import br.com.pucsp.projetointegrador.pharmacy.utils.SQLPharmacies;
 
 public class PharmacyDB {
 	private static String name = PharmacyDB.class.getSimpleName();
@@ -37,7 +38,7 @@ public class PharmacyDB {
 		try {
 			statementPharmacy.setString(1, pharmacyId);
 			
-			getPharmacy = getFromDB.getFromDB(variables, statementPharmacy);
+			getPharmacy = getFromDB.getFromDB(statementPharmacy);
 			statementPharmacy.close();
 			
 			pharmacies = new ArrayList<String>();
@@ -82,7 +83,8 @@ public class PharmacyDB {
 		stringfyProducts.append(productsId.toString().replace("[", "").replace("]", ""));
 		stringfyProducts.toString();
 		
-		String sqlProducts = "SELECT * FROM Produto WHERE id_produto in (" + stringfyProducts + ");";
+		String sqlProducts = SQLPharmacies.products(stringfyProducts);
+		
 		PreparedStatement statementProducts = DB.connect(variables).prepareStatement(sqlProducts);
 		
 		List<String> productsList = new ArrayList<String>();
