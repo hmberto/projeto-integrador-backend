@@ -1,55 +1,82 @@
 package br.com.pucsp.projetointegrador.user.getuser;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import br.com.pucsp.projetointegrador.db.DB;
 import br.com.pucsp.projetointegrador.db.GetFromDB;
+import br.com.pucsp.projetointegrador.utils.LogMessage;
 
 public class GetUserDB {
-	public static String NAME = GetUserDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetUserDB.class.getName());
+	private static String name = GetUserDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetUserDB.class.getName());
 	
-	public Map<String, String> getUserDB(Map <String, String> variables, String sessionId) {
-		LOG.entering(NAME, "getUserDB");
+	public Map<String, String> getUserDB(Map <String, String> variables, String sessionId) throws SQLException, ClassNotFoundException {
+		log.entering(name, "getUserDB");
 		
 		GetFromDB getFromDB = new GetFromDB();
 		
 		Map<String, String> user = new HashMap<String, String>();
 		
+		String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
+		PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
+		Map<String, String> getLoginSession = new HashMap<String, String>();
+		
 		try {
-			String sql1 = "SELECT * FROM Login_Sessao WHERE (id_sessao LIKE ?);";
-			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
 			statement1.setString(1, sessionId);
-			
-			Map<String, String> getLoginSession = getFromDB.getFromDB(variables, statement1);
+			getLoginSession = getFromDB.getFromDB(statement1);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
 			statement1.close();
-			
-			String sql2 = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
-			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
+			DB.disconnect();
+		}
+		
+		String sql2 = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
+		PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
+		Map<String, String> getUser = new HashMap<String, String>();
+		
+		try {
 			statement2.setString(1, getLoginSession.get("id_usuario"));
-			
-			Map<String, String> getUser = getFromDB.getFromDB(variables, statement2);
+			getUser = getFromDB.getFromDB(statement2);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
 			statement2.close();
-			
-			String sql3 = "SELECT * FROM Endereco WHERE (id_endereco LIKE ?);";
-			PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
+			DB.disconnect();
+		}
+		
+		String sql3 = "SELECT * FROM Endereco WHERE (id_endereco LIKE ?);";
+		PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
+		Map<String, String> getAddress = new HashMap<String, String>();
+		
+		try {
 			statement3.setString(1, getUser.get("id_endereco"));
-			
-			Map<String, String> getAddress = getFromDB.getFromDB(variables, statement3);
+			getAddress = getFromDB.getFromDB(statement3);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
 			statement3.close();
-			
-			String sql4 = "SELECT * FROM Genero WHERE (id_genero LIKE ?);";
-			PreparedStatement statement4 = DB.connect(variables).prepareStatement(sql4);
+			DB.disconnect();
+		}
+		
+		String sql4 = "SELECT * FROM Genero WHERE (id_genero LIKE ?);";
+		PreparedStatement statement4 = DB.connect(variables).prepareStatement(sql4);
+		
+		try {
 			statement4.setString(1, getUser.get("id_genero"));
-			
-			Map<String, String> getSex = getFromDB.getFromDB(variables, statement4);
-			statement4.close();
+			Map<String, String> getSex = getFromDB.getFromDB(statement4);
 			
 			String cpf = getUser.get("cpf");
 			
@@ -72,14 +99,15 @@ public class GetUserDB {
 			user.put("email", getUser.get("email"));
 			user.put("birthDate", getUser.get("birth_date"));
 		}
-		catch (Exception e) {
-			LOG.log(Level.SEVERE, "Data not geted from the database: " + e);
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
+			statement4.close();
 			DB.disconnect();
 		}
 		
-		LOG.exiting(NAME, "getUserDB");
+		log.exiting(name, "getUserDB");
 		return user;
 	}
 }

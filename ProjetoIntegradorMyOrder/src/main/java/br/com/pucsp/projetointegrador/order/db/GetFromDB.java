@@ -3,9 +3,9 @@ package br.com.pucsp.projetointegrador.order.db;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import br.com.pucsp.projetointegrador.order.utils.LogMessage;
@@ -14,7 +14,7 @@ public class GetFromDB {
 	private static String name = GetFromDB.class.getSimpleName();
 	private static Logger log = Logger.getLogger(GetFromDB.class.getName());
 	
-	public Map<String, String> getFromDB(PreparedStatement statement) {
+	public Map<String, String> getFromDB(PreparedStatement statement) throws SQLException {
 		String methodName = "getFromDB";
 		log.entering(name, methodName);
 		
@@ -36,13 +36,11 @@ public class GetFromDB {
 			log.exiting(name, methodName);
 			return data;
 		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
 			DB.disconnect();
 		}
-		
-		return null;
 	}
 }

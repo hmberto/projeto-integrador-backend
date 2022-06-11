@@ -29,5 +29,5 @@ public class UserMessage {
 	String email;
 	String message;
 	
-	public UserMessage() {}
+	private UserMessage() {}
 }

@@ -3,22 +3,24 @@ package br.com.pucsp.projetointegrador.db;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import br.com.pucsp.projetointegrador.utils.LogMessage;
+
 public class GetFromDB {
-	public static String NAME = GetFromDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetFromDB.class.getName());
+	private static String name = GetFromDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetFromDB.class.getName());
 	
-	public Map<String, String> getFromDB(Map<String, String> variables, PreparedStatement statement) {
-		LOG.entering(NAME, "getFromDB");
+	public Map<String, String> getFromDB(PreparedStatement statement) throws SQLException {
+		log.entering(name, "getFromDB");
 		
+		Map<String, String> data = new HashMap<String, String>();
 		try {
-			Map<String, String> data = new HashMap<String, String>();
-			
 			ResultSet g = statement.executeQuery();
+			
 			ResultSetMetaData h = g.getMetaData();
 			int columnCount = h.getColumnCount();
 			
@@ -28,20 +30,15 @@ public class GetFromDB {
 				}
 			}
 			
-			statement.close();
-			
-			LOG.log(Level.INFO, "Data getted from DB! SQL: " + statement);
-			LOG.exiting(NAME, "getUser");
+			log.exiting(name, "getUser");
 			return data;
 		}
-		catch (Exception e) {
-			LOG.log(Level.SEVERE, "GetFromDB.getFromDB: " + e);
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
+			statement.close();
 			DB.disconnect();
 		}
-		
-		LOG.exiting(NAME, "getFromDB");
-		return null;
 	}
 }

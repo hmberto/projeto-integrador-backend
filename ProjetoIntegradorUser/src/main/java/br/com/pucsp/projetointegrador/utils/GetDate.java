@@ -4,10 +4,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GetDate {
+	
+	private GetDate () {}
+	
 	public static String getDate() {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm'h'");
-		String time = dtf.format(LocalDateTime.now());
-		
-		return time;
+		return dtf.format(LocalDateTime.now());
 	}
 }

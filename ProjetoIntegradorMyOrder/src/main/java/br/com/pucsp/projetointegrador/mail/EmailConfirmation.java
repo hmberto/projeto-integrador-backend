@@ -13,8 +13,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import br.com.pucsp.projetointegrador.utils.LogMessage;
-import br.com.pucsp.projetointegrador.utils.ProjectVariables;
+import br.com.pucsp.projetointegrador.order.utils.LogMessage;
+import br.com.pucsp.projetointegrador.order.utils.ProjectVariables;
 
 public class EmailConfirmation {
 	private static String name = EmailConfirmation.class.getSimpleName();
@@ -34,7 +34,6 @@ public class EmailConfirmation {
 		props.put("mail.smtp.port", "587");
 		
 		Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
-			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(variables.get("EMAIL_PROJETO"), variables.get("SENHA_EMAIL_PROJETO"));
 			}

@@ -1,7 +1,11 @@
 package br.com.pucsp.projetointegrador.user;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,11 +16,11 @@ import br.com.pucsp.projetointegrador.utils.CheckSignUp;
 import br.com.pucsp.projetointegrador.utils.GetUserCoordinates;
 
 public class SignUp {
-	public static String NAME =  SignUp.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger( SignUp.class.getName());
+	private static String name =  SignUp.class.getSimpleName();
+	private static Logger log = Logger.getLogger( SignUp.class.getName());
 	
-	public boolean createUser(Map<String, String> variables, CreateUsers user) {
-		LOG.entering(NAME, "createUser");
+	public boolean createUser(Map<String, String> variables, CreateUsers user) throws SQLException, ClassNotFoundException, MessagingException, IOException {
+		log.entering(name, "createUser");
 		CheckSignUp validate = new CheckSignUp();
 		boolean check = validate.checkData(variables, user);
 		
@@ -37,15 +41,12 @@ public class SignUp {
 		    }
 			
 			SignUpDB createUser = new SignUpDB();
-			boolean create = createUser.CreateUserDB(variables, user, lat, lon);
+			boolean create = createUser.createUserDB(variables, user, lat, lon);
 			
-			if(create) {
-				LOG.exiting(NAME, "createUser");
-				return true;			
-			}
+			log.exiting(name, "createUser");
+			return create;
 		}
 		
-		LOG.exiting(NAME, "createUser");
 		return false;
 	}
 }

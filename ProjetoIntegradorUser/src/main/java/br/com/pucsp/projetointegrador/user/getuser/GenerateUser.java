@@ -14,14 +14,10 @@ public class GenerateUser {
 		this.name = name;
 	}
 	
-	public String getNumber() {
-		return number;
+	public String getZipCode() {
+		return zipCode;
 	}
-
-	public void setNumber(String number) {
-		this.number = number;
-	}
-
+	
 	public String getComplement() {
 		return complement;
 	}
@@ -29,11 +25,7 @@ public class GenerateUser {
 	public void setComplement(String complement) {
 		this.complement = complement;
 	}
-
-	public String getZipCode() {
-		return zipCode;
-	}
-
+	
 	public void setZipCode(String zipCode) {
 		this.zipCode = zipCode;
 	}
@@ -60,6 +52,14 @@ public class GenerateUser {
 
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
+	}
+	
+	public String getNumber() {
+		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
 	}
 
 	public String getBirthDate() {

@@ -1,11 +1,8 @@
-package br.com.pucsp.projetointegrador.utils;
+package br.com.pucsp.projetointegrador.order.utils;
 
 public class EmailTemplate {
-	
-	private EmailTemplate () {}
-	
 	public static String template(String messageSubject, String info, String shortText, String btnText, String btnLink) {
-		return "" 
+		String message = "" 
 				+ "<!DOCTYPE html>\n"
 				+ "<html lang=\"pt-br\">\n"
 				+ "<head>\n"
@@ -26,19 +23,19 @@ public class EmailTemplate {
 				+ "    <div class=\"layout one-col fixed-width stack\" style=\"Margin: 0 auto;max-width: 600px;min-width: 320px; width: 320px;width: calc(28000% - 167400px);overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;\">\n"
 				+ "    <div class=\"layout__inner\" style=\"border-collapse: collapse;display: table;width: 100%;background-color: #ffffff;\">\n"
 				+ "    <div class=\"column\" style=\"text-align: left;color: #717a8a;font-size: 16px;line-height: 24px;font-family: sans-serif;\">\n"
-				+ "    <div style=\"Margin-left: 10px;Margin-right: 10px;Margin-top: 24px;\">\n"
+				+ "    <div style=\"Margin-left: 20px;Margin-right: 20px;Margin-top: 24px;\">\n"
 				+ "  </div>\n"
 				+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
-				+ "    <h1 style=\"Margin-top: 0;Margin-bottom: 20px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 26px;line-height: 30px;text-align: center;\">\n"
+				+ "    <h1 style=\"Margin-top: 0;Margin-bottom: 20px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 30px;line-height: 38px;text-align: center;\">\n"
 				+ "      " + shortText + "\n"
 				+ "    </h1>\n"
 				+ "  </div>\n"
-				+ "  <div style=\"Margin-left: 10px;Margin-right: 10px;\">\n"
-				+ "    <h2 class=\"size-24\" style=\"Margin-top: 0;Margin-bottom: 16px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 16px;line-height: 24px;text-align: center;\" lang=\"x-size-24\">\n"
+				+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
+				+ "    <h2 class=\"size-24\" style=\"Margin-top: 0;Margin-bottom: 16px;font-style: normal;font-weight: normal;color: #3d3b3d;font-size: 20px;line-height: 28px;text-align: center;\" lang=\"x-size-24\">\n"
 				+ "      " + info + "<br><br>\n"
 				+ "    </h2>\n"
 				+ "  </div>\n"
-				+ "  <div style=\"Margin-left: 10px;Margin-right: 10px;\">\n"
+				+ "  <div style=\"Margin-left: 20px;Margin-right: 20px;\">\n"
 				+ "    <div class=\"btn btn--flat btn--large\" style=\"Margin-bottom: 20px;text-align: center;\">\n"
 				+ "      <a style=\"border-radius: 4px;display: inline-block;font-size: 14px;font-weight: bold;line-height: 24px;padding: 12px 24px;text-align: center;text-decoration: none !important;transition: opacity 0.1s ease-in;color: #ffffff !important;background-color: #337ab7;font-family: sans-serif;\" href=\"" + btnLink + "\" target=\"_blank\">\n"
 				+ "        " + btnText + "\n"
@@ -46,5 +43,7 @@ public class EmailTemplate {
 				+ "  </div>\n"
 				+ "</body>\n"
 				+ "</html>";
+		
+		return message;
 	}
 }

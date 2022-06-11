@@ -36,22 +36,25 @@ import br.com.pucsp.projetointegrador.user.signup.CreateUsers;
 import br.com.pucsp.projetointegrador.user.updateusers.UpdateUsers;
 import br.com.pucsp.projetointegrador.utils.GetIPAddress;
 import br.com.pucsp.projetointegrador.utils.GetUserAgent;
+import br.com.pucsp.projetointegrador.utils.LogMessage;
 import br.com.pucsp.projetointegrador.utils.ProjectVariables;
 
 @Produces("application/json")
 @Consumes("application/json")
 public class Rest {
-	public static String NAME = Rest.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(Rest.class.getName());
+	private static String name = Rest.class.getSimpleName();
+	private static Logger log = Logger.getLogger(Rest.class.getName());
 	
 	ProjectVariables projectVariables = new ProjectVariables();
 	Map <String, String> variables = projectVariables.projectVariables();
+	
+	int sessionLength = Integer.parseInt(variables.get("SESSION_LENGTH"));
 	
 	URI uri = URI.create("https://projeto-integrador-frontend.herokuapp.com");
 	
 	@GET
 	@Path("/")
-	public Response getTest() throws Exception {
+	public Response getTest() {
 		String test = "{\n"
 				+ "    \"Hello\":\"World!\"\n"
 				+ "}";
@@ -62,226 +65,194 @@ public class Rest {
 	@POST
 	@Path("/user/login")
 	public Response loginUsers(@Context HttpServletRequest request, LogInUser login) {
-		LOG.entering(NAME, "loginUsers");
-		boolean check = true;
+		log.entering(name, "loginUsers");
+		
+		GetUserAgent getUserAgent = new GetUserAgent();
+		String userAgent = getUserAgent.getUserAgent(request);
+		
+		GetIPAddress ipAddress = new GetIPAddress();
+		String ip = ipAddress.getIp(request);
+		
 		try {
-			int MAX_PASS_LENGTH = Integer.parseInt(variables.get("MAX_PASS_LENGTH"));
-			int MIN_PASS_LENGTH = Integer.parseInt(variables.get("MIN_PASS_LENGTH"));
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+			LogIn newLogin = new LogIn();
+			Map<Integer, String> session = newLogin.authenticateUser(variables, login, userAgent, ip);
 			
-			boolean emailMatches = login.getEmail().matches(variables.get("REGEX_EMAIL"));
-			if(login.getEmail().length() > 10 && login.getEmail().length() < 60 && emailMatches) {}
-			else { check = false; }
-			
-			boolean passMatches = login.getPass().matches(variables.get("REGEX_PASS"));
-			if(login.getPass().length() >= MIN_PASS_LENGTH && login.getPass().length() < MAX_PASS_LENGTH && passMatches) {}
-			else { check = false; }
-			
-			if(check) {
-				GetUserAgent getUserAgent = new GetUserAgent();
-				String userAgent = getUserAgent.getUserAgent(request);
-				
-				GetIPAddress ipAddress = new GetIPAddress();
-				String IP = ipAddress.getIp(request);
-				
-				LogIn newLogin = new LogIn();
-				Map<Integer, String> session = newLogin.authenticateUser(userAgent, variables, login.getEmail().toLowerCase(), login.getPass(), IP, login.getNewLogin());
-				
-				if(session.get(1).length() == SESSION_LENGTH) {
-					LOG.exiting(NAME, "loginUsers");
-					return Response.ok(new GenerateLogin(session)).build();
-				}
+			if(session.get(1).length() == sessionLength) {
+				log.exiting(name, "loginUsers");
+				return Response.ok(new GenerateLogin(session)).build();
 			}
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "User not authenticated: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "loginUsers");
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 	
 	@POST
 	@Path("/user/signup")
 	public Response signupUsers(CreateUsers user) {
-		LOG.entering(NAME, "signupUsers");
+		log.entering(name, "signupUsers");
 		
 		try {
-			SignUp SignUp = new SignUp();
-			boolean check = SignUp.createUser(variables, user);
+			SignUp signUp = new SignUp();
+			boolean check = signUp.createUser(variables, user);
 			
 			if(check) {
-				LOG.exiting(NAME, "signupUsers");
+				log.exiting(name, "signupUsers");
 				return Response.status(Response.Status.CREATED).build();
 			}
 		}
 		catch(Exception e) {
-			LOG.log(Level.SEVERE, "User not created: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't create user!");
-		LOG.exiting(NAME, "signupUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@PUT
 	@Path("/user/logout/{session}")
 	public Response logoutUsers(@PathParam("session") String session) {
-		LOG.entering(NAME, "logoutUsers");
+		log.entering(name, "logoutUsers");
 		
 		try {
 			LogOut logoutUser = new LogOut();
 			boolean check = logoutUser.logout(variables, session);
 			
 			if(check) {
-				LOG.exiting(NAME, "logoutUsers");
+				log.exiting(name, "logoutUsers");
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		} 
 		catch (Exception e) {
-			LOG.log(Level.SEVERE, "User not unauthenticated: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't logout user!");
-		LOG.exiting(NAME, "logoutUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/user/confirm-email/{email}/{token}")
 	public Response confirmEmail(@PathParam("token") String token, @PathParam("email") String email) {
-		LOG.entering(NAME, "confirmEmail");
+		log.entering(name, "confirmEmail");
 		
 		try {
 			ConfirmEmail confirmEmail = new ConfirmEmail();
 			boolean check = confirmEmail.confirm(variables, token, email.toLowerCase());
 			
 			if(check) {
-				LOG.exiting(NAME, "confirmEmail");
+				log.exiting(name, "confirmEmail");
 				return Response.temporaryRedirect(uri).build();
-				// return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "User not confirmed: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't confirm user!");
-		LOG.exiting(NAME, "confirmEmail");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@POST
 	@Path("/user/new-password")
 	public Response recNewPassword(NewPass pass) {
-		LOG.entering(NAME, "recNewPassword");
+		log.entering(name, "recNewPassword");
 		
 		try {
 			RecNewPassword recNewPassword = new RecNewPassword();
 			boolean check = recNewPassword.changePass(variables, pass);
 			
 			if(check) {
-				LOG.exiting(NAME, "recNewPassword");
+				log.exiting(name, "recNewPassword");
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		}
 		catch(Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't get new user password: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't get new user password!");
-		LOG.exiting(NAME, "recNewPassword");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@POST
 	@Path("/user/change-password")
 	public Response changePassword(ChangePass pass) {
-		LOG.entering(NAME, "changePassword");
+		log.entering(name, "changePassword");
 		
 		try {
 			ChangePassword changePassword = new ChangePassword();
 			boolean check = changePassword.changePass(variables, pass);
 			
 			if(check) {
-				LOG.exiting(NAME, "changePassword");
+				log.exiting(name, "changePassword");
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		}
 		catch(Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't change user password: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't change user password!");
-		LOG.exiting(NAME, "changePassword");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
 	@Path("/user/get-user/{sessionId}")
 	public Response getUser(@PathParam("sessionId") String sessionId) {
-		LOG.entering(NAME, "getUser");
+		log.entering(name, "getUser");
 		
 		try {
-			int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
-			if(sessionId.length() == SESSION_LENGTH) {
+			if(sessionId.length() == sessionLength) {
 				GetUser getUser = new GetUser();
 				Map<String, String> user = getUser.user(variables, sessionId);
 				
 				if(user.get("email").length() >= 10) {
-					LOG.exiting(NAME, "getUser");
+					log.exiting(name, "getUser");
 					return Response.ok(new GenerateUser(user)).build();
 				}
 			}
 		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "User not confirmed: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't confirm user!");
-		LOG.exiting(NAME, "confirmEmail");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@POST
 	@Path("/user/update")
 	public Response updateUsers(UpdateUsers user) {
-		LOG.entering(NAME, "updateUsers");
+		log.entering(name, "updateUsers");
 		
 		try {
 			Update update = new Update();
 			boolean check = update.updateUsers(variables, user);
 			
 			if(check) {
-				LOG.exiting(NAME, "updateUsers");
+				log.exiting(name, "updateUsers");
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		}
 		catch(Exception e) {
-			LOG.log(Level.SEVERE, "User not updated: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.log(Level.INFO, "Couldn't update user!");
-		LOG.exiting(NAME, "updateUsers");
 		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@POST
 	@Path("/user/experience/contact")
 	public Response userExperience(@Context HttpServletRequest request, UserMessage message) {
-		LOG.entering(NAME, "userExperience");
+		log.entering(name, "userExperience");
 		
 		try {
 			ContactUs contactUs = new ContactUs();
-			boolean check = contactUs.contactUs(request, message);
+			boolean check = contactUs.contactUs(message);
 			
 			if(check) {
-				LOG.exiting(NAME, "userExperience");
+				log.exiting(name, "userExperience");
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 		}
 		catch(Exception e) {
-			LOG.log(Level.SEVERE, "Couldn't message us: " + e);
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
 		
-		LOG.exiting(NAME, "userExperience");
 		return null;
 	}
 	

@@ -1,35 +1,30 @@
 package br.com.pucsp.projetointegrador.user;
 
+import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
 
 import br.com.pucsp.projetointegrador.user.password.NewPass;
 import br.com.pucsp.projetointegrador.user.password.RecNewPasswordDB;
 
 public class RecNewPassword {
-	public static String NAME =  RecNewPassword.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger( RecNewPassword.class.getName());
+	private static String name =  RecNewPassword.class.getSimpleName();
+	private static Logger log = Logger.getLogger( RecNewPassword.class.getName());
 	
-	public boolean changePass(Map<String, String> variables, NewPass pass) {
-		LOG.entering(NAME, "changePass");
-		
-		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+	public boolean changePass(Map<String, String> variables, NewPass pass) throws MessagingException, ClassNotFoundException, SQLException {
+		log.entering(name, "changePass");
 		
 		boolean checkEmail = pass.getEmail().toLowerCase().matches(variables.get("REGEX_EMAIL"));
 		if(pass.getEmail().length() < 60 && checkEmail) {
-			LOG.log(Level.INFO, "RecNewPassword.changePass: Email OK");
-			
 			RecNewPasswordDB recNewPasswordDB = new RecNewPasswordDB();
-			boolean change = recNewPasswordDB.newPassword(variables, pass, SESSION_LENGTH);
-			LOG.exiting(NAME, "changePass");
-			return change;
-		}
-		else { 
-			LOG.log(Level.SEVERE, "RecNewPassword.changePass: Incorrect Email");
+			
+			log.exiting(name, "changePass");
+			
+			return recNewPasswordDB.newPassword(variables, pass);
 		}
 		
-		LOG.exiting(NAME, "changePass");
 		return false;
 	}
 }

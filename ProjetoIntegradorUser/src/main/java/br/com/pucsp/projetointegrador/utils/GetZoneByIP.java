@@ -5,18 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GetZoneByIP {
-	public static String NAME = GetZoneByIP.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetZoneByIP.class.getName());
+	private static String name = GetZoneByIP.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetZoneByIP.class.getName());
 	
-	public String getData(String IP) {
-		LOG.entering(NAME, "getData");
-		String url = "https://ipapi.co/" + IP + "/json/";
-		
-		LOG.log(Level.INFO, "url user zone: " + url);
+	public String getData(String ip) throws IOException {
+		log.entering(name, "getData");
+		String url = "https://ipapi.co/" + ip + "/json/";
 		
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -24,28 +21,21 @@ public class GetZoneByIP {
 		    conn.setRequestProperty("Content-Type", "application/json");
 	        conn.setRequestProperty("Accept", "application/json");
 	        
-	        if (conn.getResponseCode() != 200) {
-	            LOG.log(Level.SEVERE, "Erro " + conn.getResponseCode() + " ao obter dados da URL " + url);
-	        }
-	        
 	        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-
-	        String output = "";
+	        
+	        StringBuilder output = new StringBuilder();
 	        String line;
 	        while ((line = br.readLine()) != null) {
-	            output += line;
+	            output.append(line);
 	        }
 	        
 	        conn.disconnect();
 	        
-	        LOG.exiting(NAME, "getData");
-	        return output;
+	        log.exiting(name, "getData");
+	        return output.toString();
 		}
 		catch (IOException e) {
-			LOG.log(Level.SEVERE, "Zone by IP not getted: " + e);
+			throw new IOException(LogMessage.message(e.toString()));
 		}
-		
-		LOG.exiting(NAME, "getData");
-		return "";
 	}
 }

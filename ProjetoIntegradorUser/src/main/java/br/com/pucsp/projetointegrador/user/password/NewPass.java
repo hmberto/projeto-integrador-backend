@@ -13,5 +13,5 @@ public class NewPass {
 	
 	String email;
 	
-	public NewPass() {}
+	private NewPass() {}
 }

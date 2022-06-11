@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
@@ -23,7 +22,7 @@ public class GetOrdersDB {
 	
 	List<Float> productsPrice = new ArrayList<Float>();
 
-	public StringBuilder getOrders(Map<String, String> variables, PreparedStatement statementOrders) {
+	public StringBuilder getOrders(Map<String, String> variables, PreparedStatement statementOrders) throws SQLException {
 		String methodName = "getOrders";
 		log.entering(name, methodName);
 		
@@ -111,14 +110,13 @@ public class GetOrdersDB {
 				createPayload.endObject();
 			}
 			
-			statementOrders.close();
-			
 			createPayload.endObject();
 		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
+			statementOrders.close();
 			DB.disconnect();
 		}
 		

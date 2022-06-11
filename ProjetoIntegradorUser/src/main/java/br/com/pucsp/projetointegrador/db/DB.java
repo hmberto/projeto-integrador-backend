@@ -8,21 +8,19 @@ import java.sql.DriverManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DB {
-	public static String NAME = DB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(DB.class.getName());
-	
-//	private static final String DATABASE_DRIVER = EnvVariables.getEnvVariable("DATABASE_DRIVER");
-//  private static final String DATABASE_URL = EnvVariables.getEnvVariable("DATABASE_URL");
-//  private static final String USERNAME = EnvVariables.getEnvVariable("USERNAME");
-//  private static final String PASSWORD = EnvVariables.getEnvVariable("PASSWORD");
-//  private static final String MAX_POOL = EnvVariables.getEnvVariable("MAX_POOL");
+import br.com.pucsp.projetointegrador.utils.LogMessage;
 
+public class DB {
+	private DB () {}
+	
+	private static String name = DB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(DB.class.getName());
+	
     private static Connection connection;
     private static Properties properties;
 
     private static Properties getProperties(Map <String, String> variables) {
-    	LOG.entering(NAME, "getProperties");
+    	log.entering(name, "getProperties");
     	
     	if (properties == null) {
     		properties = new Properties();
@@ -31,44 +29,44 @@ public class DB {
     		properties.setProperty("MaxPooledStatements", variables.get("MAX_POOL"));
     	}
     	
-    	LOG.log(Level.INFO, "Properties setuped");
+    	log.log(Level.INFO, "Properties setuped");
     	
-    	LOG.exiting(NAME, "getProperties");
+    	log.exiting(name, "getProperties");
     	return properties;
     }
 
-	public static Connection connect(Map <String, String> variables) {
-		LOG.entering(NAME, "connect");
+	public static Connection connect(Map <String, String> variables) throws SQLException, ClassNotFoundException {
+		log.entering(name, "connect");
 		
 		if (connection == null) {
 			try {
 				Class.forName(variables.get("DATABASE_DRIVER"));
 				connection = DriverManager.getConnection(variables.get("DATABASE_URL"), getProperties(variables));
 				
-				LOG.log(Level.INFO, "Connection started");
-			} catch (Exception e) {
-				LOG.log(Level.SEVERE, "Connection not started" + e);
+				log.log(Level.INFO, "Connection started");
+			} catch (SQLException e) {
+				throw new SQLException(LogMessage.message(e.toString()));
 			}
 		}
 		
-		LOG.exiting(NAME, "connect");
+		log.exiting(name, "connect");
 		return connection;
 	}
 
-	public static void disconnect() {
-		LOG.entering(NAME, "disconnect");
+	public static void disconnect() throws SQLException {
+		log.entering(name, "disconnect");
 		
         if (connection != null) {
             try {
                 connection.close();
                 connection = null;
                 
-                LOG.log(Level.INFO, "Connection closed");
+                log.log(Level.INFO, "Connection closed");
             } catch (SQLException e) {
-            	LOG.log(Level.SEVERE, "Connection not closed" + e);
+            	throw new SQLException(LogMessage.message(e.toString()));
             }
         }
         
-        LOG.exiting(NAME, "disconnect");
+        log.exiting(name, "disconnect");
     }
 }

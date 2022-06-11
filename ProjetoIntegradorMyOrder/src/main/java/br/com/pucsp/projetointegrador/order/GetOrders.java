@@ -42,6 +42,7 @@ public class GetOrders {
 		}
 		finally {
 			statementOrders.close();
+			DB.disconnect();
 		}
 	}
 }

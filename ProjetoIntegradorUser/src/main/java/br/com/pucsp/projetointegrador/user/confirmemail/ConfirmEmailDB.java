@@ -2,49 +2,71 @@ package br.com.pucsp.projetointegrador.user.confirmemail;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.mail.MessagingException;
 
 import br.com.pucsp.projetointegrador.db.DB;
 import br.com.pucsp.projetointegrador.db.GetFromDB;
 import br.com.pucsp.projetointegrador.mail.EmailConfirmation;
 import br.com.pucsp.projetointegrador.utils.EmailTemplate;
+import br.com.pucsp.projetointegrador.utils.LogMessage;
 
 public class ConfirmEmailDB {
-	public static String NAME = ConfirmEmailDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(ConfirmEmailDB.class.getName());
+	private static String name = ConfirmEmailDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(ConfirmEmailDB.class.getName());
 	
-	public boolean confirmation(Map <String, String> variables, String token, String email) {
-		LOG.entering(NAME, "confirmation");
+	public boolean confirmation(Map <String, String> variables, String token, String email) throws MessagingException, ClassNotFoundException, SQLException {
+		log.entering(name, "confirmation");
 		
 		GetFromDB getFromDB = new GetFromDB();
 		
 		String sql1 = "UPDATE Usuario SET ativo = true WHERE (token_confirmacao_cadastro LIKE ?) AND (email LIKE ?);";
 		String sql2 = "UPDATE Usuario SET token_confirmacao_cadastro = ? WHERE (email LIKE ?);";
 		
+		String sql3 = "SELECT * FROM Usuario WHERE (email LIKE ?);";
+		PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
+		
+		Map<String, String> getUser = new HashMap<String, String>();
+		
 		try {
-			String sql3 = "SELECT * FROM Usuario WHERE (email LIKE ?);";
-			PreparedStatement statement3 = DB.connect(variables).prepareStatement(sql3);
 			statement3.setString(1, email);
 			
-			Map<String, String> getUser = getFromDB.getFromDB(variables, statement3);
-			
-			PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
+			getUser = getFromDB.getFromDB(statement3);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statement3.close();
+			DB.disconnect();
+		}
+		
+		PreparedStatement statement1 = DB.connect(variables).prepareStatement(sql1);
+		
+		try {
 			statement1.setString(1, token);
 			statement1.setString(2, email);
 			
 			statement1.execute();
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
 			statement1.close();
-			
-			PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
+			DB.disconnect();
+		}
+		
+		PreparedStatement statement2 = DB.connect(variables).prepareStatement(sql2);
+		
+		try {
 			statement2.setString(1, "NULL");
 			statement2.setString(2, email);
 			
 			statement2.execute();
-			statement2.close();
-			
-			LOG.log(Level.INFO, "Successfully confirmation - E-mail: " + email);
 			
 			String messageSubject = "Entrega de Farmácias - E-mail confirmado";
 			String shortText = "Obrigado por confirmar sua conta.";
@@ -58,17 +80,15 @@ public class ConfirmEmailDB {
 				sendEmail.confirmation(email, messageSubject, messageText);
 			}
 			
-			LOG.exiting(NAME, "confirmation");
+			log.exiting(name, "confirmation");
 			return true;
 		}
 		catch (SQLException e) {
-			LOG.log(Level.SEVERE, "Failed confirmation - E-mail: " + email + " - Erro: " + e);
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
+			statement2.close();
 			DB.disconnect();
 		}
-		
-		LOG.exiting(NAME, "confirmation");
-		return false;
 	}
 }

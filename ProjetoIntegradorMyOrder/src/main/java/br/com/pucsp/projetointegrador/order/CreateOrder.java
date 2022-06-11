@@ -4,6 +4,9 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.mail.MessagingException;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.order.create.CreateOrderDB;
@@ -13,7 +16,7 @@ public class CreateOrder {
 	private static String name = CreateOrder.class.getSimpleName();
 	private static Logger log = Logger.getLogger(CreateOrder.class.getName());
 	
-	public JSONObject createOrder(Map <String, String> variables, NewOrder order) throws SQLException {
+	public JSONObject createOrder(Map <String, String> variables, NewOrder order) throws SQLException, JSONException, MessagingException {
 		log.entering(name, "createOrder");
 		
 		CreateOrderDB createOrderDB = new CreateOrderDB();

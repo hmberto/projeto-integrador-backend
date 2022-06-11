@@ -7,106 +7,81 @@ import java.util.logging.Logger;
 import br.com.pucsp.projetointegrador.user.updateusers.UpdateUsers;
 
 public class CheckUpdate {
-	public static String NAME = CheckUpdate.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(CheckUpdate.class.getName());
+	private static String name = CheckUpdate.class.getSimpleName();
+	private static Logger log = Logger.getLogger(CheckUpdate.class.getName());
 	
 	public boolean checkData(Map<String, String> variables, UpdateUsers user) {
-		LOG.entering(NAME, "checkData");
+		log.entering(name, "checkData");
+		
+		String regexName = variables.get("REGEX_NAMES_1");
 		
 		boolean test = true;
 
 		// Verifica Nome
-		boolean validateName = user.getName().matches(variables.get("REGEX_NAMES_1"));
+		boolean validateName = user.getName().matches(regexName);
 		String[] nomeSeparado = user.getName().split(" ");
-		if(nomeSeparado.length >= 2 && user.getName().length() < 50 && validateName) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: Name OK");
-		}
-		else { 
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect Name");
+		if(nomeSeparado.length < 2 || user.getName().length() > 50 || !validateName) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect Name");
 			test = false; 
 		}
 		
 		// Verifica Sexo
 		boolean searchForCharactersE = user.getSex().matches("[1-4]");
-		if(searchForCharactersE) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: Sex OK");
-		}
-		else {
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect Sex");
-			test = false; 
+		if(!searchForCharactersE) {
+			log.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect Sex");
+			test = false;
 		}
 		
 		// Verifica Rua
 		boolean searchForCharactersI = user.getStreet().matches(variables.get("REGEX_NAMES_2"));
-		if(user.getStreet().length() < 100 && searchForCharactersI) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: Street OK");
-		}
-		else { 
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect Street");
+		if(user.getStreet().length() >= 100 || !searchForCharactersI) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect Street");
 			test = false; 
 		}
 		
 		// Verifica Número da casa
 		boolean searchForCharactersJ = user.getNumber().matches(variables.get("REGEX_NUMBER"));
-		if(user.getNumber().length() >= 1 && user.getNumber().length() < 10 && searchForCharactersJ) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: House Number OK");
-		}
-		else { 
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect House Number");
+		if(user.getNumber().length() < 1 || user.getNumber().length() >= 10 || !searchForCharactersJ) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect House Number");
 			test = false; 
 		}
 		
 		// Verifica Complemento
 		boolean searchForCharactersR = user.getComplement().matches(variables.get("REGEX_NAMES_2"));
-		if(user.getComplement().length() < 50 && searchForCharactersR) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: Complement OK");
-		}
-		else {
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect Complement");
+		if(user.getComplement().length() > 50 || !searchForCharactersR) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect Complement");
 			test = false; 
 		}
 		
 		// Verifica Bairro
-		boolean searchForCharactersK = user.getDistrict().matches(variables.get("REGEX_NAMES_1"));
-		if(user.getDistrict().length() < 30 && searchForCharactersK) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: District OK");
-		}
-		else {
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect District");
+		boolean searchForCharactersK = user.getDistrict().matches(regexName);
+		if(!searchForCharactersK) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect District");
 			test = false; 
 		}
 		
 		// Verifica CEP
 		boolean searchForCharactersL = user.getZipCode().matches("[0-9]{5}[-][0-9]{3}");
-		if(user.getZipCode().length() == 9 && searchForCharactersL) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: Zip Code OK");
-		}
-		else {
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect Zip Code");
+		if(user.getZipCode().length() != 9 || !searchForCharactersL) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect Zip Code");
 			test = false; 
 		}
 		
 		// Verifica Cidade
-		boolean searchForCharactersM = user.getCity().matches(variables.get("REGEX_NAMES_1"));
-		if(user.getCity().length() < 30 && searchForCharactersM) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: City OK");
-		}
-		else {
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect City");
-			test = false; 
+		boolean searchForCharactersM = user.getCity().matches(regexName);
+		if(!searchForCharactersM) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect City");
+			test = false;
 		}
 		
 		// Verifica Estado
 		boolean searchForCharactersN = user.getState().matches("[A-Z]{2}");
-		if(searchForCharactersN) {
-			LOG.log(Level.INFO, "CheckUpdate.checkData: State OK");
-		}
-		else {
-			LOG.log(Level.SEVERE, "CheckUpdate.checkData: Incorrect State");
-			test = false; 
+		if(!searchForCharactersN) {
+			log.log(Level.SEVERE, "DcheckData.checkData: Incorrect State");
+			test = false;
 		}
 		
-		LOG.exiting(NAME, "checkData");
+		log.exiting(name, "checkData");
 		return test;
 	}
 }

@@ -4,39 +4,39 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import br.com.pucsp.projetointegrador.db.DB;
+import br.com.pucsp.projetointegrador.utils.LogMessage;
 
 public class LogoutDB {
-	public static String NAME = LogoutDB.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(LogoutDB.class.getName());
+	private static String name = LogoutDB.class.getSimpleName();
+	private static Logger log = Logger.getLogger(LogoutDB.class.getName());
 	private boolean check = false;
 	
-	public boolean LogoutUser(Map <String, String> variables, String sessionId) {
-		LOG.entering(NAME, "LogoutUser");
+	public boolean logoutUser(Map <String, String> variables, String sessionId) throws ClassNotFoundException, SQLException {
+		log.entering(name, "LogoutUser");
 		
 		String sql = "UPDATE Login_Sessao SET id_sessao = ? WHERE (id_sessao LIKE ?);";
+		PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 		
 		try {
-			PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 			statement.setString(1, "NULL");
 			statement.setString(2, sessionId);
 			
 			statement.execute();			
-			statement.close();
 			
 			check = true;
 		}
 		catch (SQLException e) {
-			LOG.log(Level.SEVERE, "LogoutDB.LogoutUser Error: : " + e);
+			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
+			statement.close();
 			DB.disconnect();
 		}
 		
-		LOG.exiting(NAME, "LogoutUser");
+		log.exiting(name, "LogoutUser");
 		return check;
 	}
 }

@@ -29,5 +29,5 @@ public class ChangePass {
 	String token;
 	String newPass;
 	
-	public ChangePass() {}
+	private ChangePass() {}
 }

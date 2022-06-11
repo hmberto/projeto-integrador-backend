@@ -29,5 +29,5 @@ public class LogInUser {
 	String pass;
 	String newLogin;
 	
-	public LogInUser() {}
+	private LogInUser() {}
 }

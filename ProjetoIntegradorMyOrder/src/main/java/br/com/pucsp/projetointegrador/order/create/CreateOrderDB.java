@@ -9,10 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.mail.MessagingException;
+
 import org.json.JSONWriter;
 
+import br.com.pucsp.projetointegrador.mail.EmailConfirmation;
 import br.com.pucsp.projetointegrador.order.db.DB;
 import br.com.pucsp.projetointegrador.order.db.GetFromDB;
+import br.com.pucsp.projetointegrador.order.utils.EmailTemplate;
 import br.com.pucsp.projetointegrador.order.utils.InsertProductsDB;
 import br.com.pucsp.projetointegrador.order.utils.LogMessage;
 import br.com.pucsp.projetointegrador.order.utils.SQLOrders;
@@ -21,7 +25,7 @@ public class CreateOrderDB {
 	private static String name = CreateOrderDB.class.getSimpleName();
 	private static Logger log = Logger.getLogger(CreateOrderDB.class.getName());
 	
-	public StringBuilder createOrder(Map <String, String> variables, NewOrder order) throws SQLException {
+	public StringBuilder createOrder(Map <String, String> variables, NewOrder order) throws SQLException, MessagingException {
 		String methodName = "createOrder";
 		log.entering(name, methodName);
 		
@@ -188,7 +192,6 @@ public class CreateOrderDB {
 			statementDeliveryId.close();
 		}
 		
-		
 		String createOrder = "INSERT INTO Compra (data_compra, distancia_farmacia, tempo_entrega, taxa_entrega, local_entrega, id_usuario, id_farmacia, id_entrega, id_forma_pagamento, id_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		PreparedStatement statementOrder = DB.connect(variables).prepareStatement(createOrder);
 		
@@ -233,6 +236,8 @@ public class CreateOrderDB {
 			products = insertProductsDB.insertProducts(variables, order, getOrderId.get("id_compra"));
 			
 			if(products) {
+				sendUserEmail(variables, idUsuario, getOrderId.get("id_compra"));
+				
 				log.exiting(name, methodName);
 				return payload;
 			}
@@ -246,5 +251,39 @@ public class CreateOrderDB {
 		}
 		
 		return null;
+	}
+	
+	public void sendUserEmail(Map <String, String> variables, String userID, String orderID) throws SQLException, MessagingException {
+		Map<String, String> getUser = new HashMap<String, String>();
+		String sql = "SELECT * FROM Usuario WHERE (id_usuario LIKE ?);";
+		PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
+		
+		GetFromDB getFromDB = new GetFromDB();
+		
+		try {
+			statement.setString(1, userID);
+			
+			getUser = getFromDB.getFromDB(statement);
+		}
+		catch (SQLException e) {
+			throw new SQLException(LogMessage.message(e.toString()));
+		}
+		finally {
+			statement.close();
+			DB.disconnect();
+		}
+		
+
+		String[] nomeSeparado = getUser.get("nome").split(" ");
+		
+		String messageSubject = "Entrega de Farmácias - Recebemos seu pedido";
+		String shortText = nomeSeparado[0] + ", obrigado pelo seu pedido.";
+		String info = "Passamos para confirmar que já recebemos seu pedido #" + orderID + " e ele já está sendo processado.<br><br>Para ver detalhes da sua compra e acompanhar a entrega clique no botão abaixo ou acompanhe pela página \"Meus pedidos\" em nosso site.";
+		String btnText = "Acompanhar pedido";
+		String btnLink = "https://projeto-integrador-frontend.herokuapp.com/pedido?orderId=" + orderID;
+		String messageText = EmailTemplate.template(messageSubject, info, shortText, btnText, btnLink);
+		
+		EmailConfirmation sendEmail = new EmailConfirmation();
+		sendEmail.confirmation(getUser.get("email"), messageSubject, messageText);
 	}
 }

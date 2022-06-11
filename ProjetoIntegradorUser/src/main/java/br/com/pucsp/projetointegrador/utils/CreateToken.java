@@ -4,16 +4,18 @@ import java.util.Map;
 
 public class CreateToken {
 	public String createToken(Map<String, String> variables) {
-		int SESSION_LENGTH = Integer.parseInt(variables.get("SESSION_LENGTH"));
+		int sessionLength = Integer.parseInt(variables.get("SESSION_LENGTH"));
 		String alphaNumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		String token = "";
 		
-		for(int i = 0; i < SESSION_LENGTH; i++) {
-			int myindex = (int)(alphaNumeric.length() * Math.random());
+		StringBuilder token = new StringBuilder();
+		
+		for(int i = 0; i < sessionLength; i++) {
+			double random = Math.random();
+			int myindex = (int)(alphaNumeric.length() * random);
 			
-			token = token + alphaNumeric.charAt(myindex);
+			token.append(alphaNumeric.charAt(myindex));
 		}
 		
-		return token;
+		return token.toString();
 	}
 }

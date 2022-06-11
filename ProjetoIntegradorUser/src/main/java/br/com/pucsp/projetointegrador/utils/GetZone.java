@@ -1,26 +1,24 @@
 package br.com.pucsp.projetointegrador.utils;
 
-import java.util.logging.Level;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
 public class GetZone {
-	public static String NAME = GetZone.class.getSimpleName();
-	private static Logger LOG = Logger.getLogger(GetZone.class.getName());
+	private static String name = GetZone.class.getSimpleName();
+	private static Logger log = Logger.getLogger(GetZone.class.getName());
 	
-	public String getZone(String IP) {
-		LOG.entering(NAME, "getZone");
+	public String getZone(String ip) throws IOException {
+		log.entering(name, "getZone");
 		GetZoneByIP getData = new GetZoneByIP();
-		String data = getData.getData(IP);
+		String data = getData.getData(ip);
 		
-		JSONObject object = new JSONObject(data.toString());
+		JSONObject object = new JSONObject(data);
 		
 		String zone = object.get("city") + " - " + object.get("region_code");
 		
-		LOG.log(Level.INFO, "IP user zone: " + zone);
-		
-		LOG.exiting(NAME, "getZone");
+		log.exiting(name, "getZone");
 		return zone;
 	}
 }
