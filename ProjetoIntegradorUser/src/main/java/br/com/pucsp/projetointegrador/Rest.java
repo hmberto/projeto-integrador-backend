@@ -17,6 +17,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import br.com.pucsp.projetointegrador.deliveryman.SignUpDeliveryman;
+import br.com.pucsp.projetointegrador.deliveryman.login.GenerateDeliverymanLogin;
+import br.com.pucsp.projetointegrador.deliveryman.login.LogInDeliverymanUser;
+import br.com.pucsp.projetointegrador.deliveryman.LogInDeliveryman;
+import br.com.pucsp.projetointegrador.deliveryman.signup.CreateDeliveryman;
 import br.com.pucsp.projetointegrador.user.ChangePassword;
 import br.com.pucsp.projetointegrador.user.ConfirmEmail;
 import br.com.pucsp.projetointegrador.user.ContactUs;
@@ -254,6 +259,47 @@ public class Rest {
 		}
 		
 		return null;
+	}
+	
+	@POST
+	@Path("/deliveryman/login")
+	public Response loginDeliveryman(@Context HttpServletRequest request, LogInDeliverymanUser login) {
+		log.entering(name, "loginUsers");
+		
+		try {
+			LogInDeliveryman logInDeliveryman = new LogInDeliveryman();
+			Map<String, String> session = logInDeliveryman.authenticateUser(variables, login);
+			
+			log.exiting(name, "loginUsers");
+			if(session.get("cpf").length() == 11) {
+				return Response.ok(new GenerateDeliverymanLogin(session)).build();
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		}
+		
+		return Response.status(Response.Status.FORBIDDEN).build();
+	}
+	
+	@POST
+	@Path("/deliveryman/signup")
+	public Response signupDeliveryman(CreateDeliveryman user) {
+		log.entering(name, "signupDeliveryman");
+		
+		try {
+			SignUpDeliveryman signUpDeliveryman = new SignUpDeliveryman();
+			boolean check = signUpDeliveryman.createUser(variables, user);
+			
+			if(check) {
+				log.exiting(name, "signupDeliveryman");
+				return Response.status(Response.Status.CREATED).build();
+			}
+		}
+		catch(Exception e) {
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@OPTIONS
