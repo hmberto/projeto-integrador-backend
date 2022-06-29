@@ -17,6 +17,8 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import br.com.pucsp.projetointegrador.order.CreateOrder;
+import br.com.pucsp.projetointegrador.order.DeliveryOrder;
+import br.com.pucsp.projetointegrador.order.DeliveryOrders;
 import br.com.pucsp.projetointegrador.order.GetOrder;
 import br.com.pucsp.projetointegrador.order.GetOrders;
 import br.com.pucsp.projetointegrador.order.Products;
@@ -107,6 +109,46 @@ public class Rest {
 			
 			log.exiting(name, "getOrder");
 			return Response.ok(orders.toString()).build();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/delivery/orders/{deliverymanID}")
+	public Response deliveryOrders(@PathParam("deliverymanID") String deliverymanID) {
+		log.entering(name, "deliveryOrders");
+		
+		DeliveryOrders deliveryOrders = new DeliveryOrders();
+		
+		try {
+			JSONObject payload = deliveryOrders.deliveryOrders(variables, deliverymanID);
+			
+			log.exiting(name, "deliveryOrders");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@POST
+	@Path("/delivery/order/{deliverymanID}/{orderID}/{statusID}")
+	public Response deliveryOrder(@PathParam("deliverymanID") String deliverymanID, @PathParam("orderID") String orderID, @PathParam("statusID") String statusID) {
+		log.entering(name, "deliveryOrder");
+		
+		DeliveryOrder deliveryOrder = new DeliveryOrder();
+		
+		try {
+			boolean check = deliveryOrder.deliveryOrder(variables, deliverymanID, orderID, statusID);
+			
+			if(check) {
+				log.exiting(name, "deliveryOrder");
+				return Response.ok().build();
+			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, LogMessage.message(e.toString()));
 		}
