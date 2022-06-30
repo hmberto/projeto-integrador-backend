@@ -1,6 +1,7 @@
 package br.com.pucsp.projetointegrador;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +36,7 @@ public class Rest {
 	
 	ProjectVariables projectVariables = new ProjectVariables();
 	Map <String, String> variables = projectVariables.projectVariables();
+	Map <String, String> cacheAddress = new HashMap<String, String>();
 	
 	URI uri = URI.create("https://projeto-integrador-frontend.herokuapp.com");
 	
@@ -124,7 +126,7 @@ public class Rest {
 		DeliveryOrders deliveryOrders = new DeliveryOrders();
 		
 		try {
-			JSONObject payload = deliveryOrders.deliveryOrders(variables, deliverymanID);
+			JSONObject payload = deliveryOrders.deliveryOrders(variables, cacheAddress, deliverymanID);
 			
 			log.exiting(name, "deliveryOrders");
 			return Response.ok(payload.toString()).build();

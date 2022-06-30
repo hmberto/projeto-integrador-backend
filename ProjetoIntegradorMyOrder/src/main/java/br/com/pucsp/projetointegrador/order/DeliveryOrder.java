@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import br.com.pucsp.projetointegrador.order.db.DB;
 import br.com.pucsp.projetointegrador.order.db.GetFromDB;
-import br.com.pucsp.projetointegrador.order.utils.CheckDeliveryman;
 import br.com.pucsp.projetointegrador.order.utils.LogMessage;
 
 public class DeliveryOrder {
@@ -19,9 +18,6 @@ public class DeliveryOrder {
 		log.entering(name, "deliveryOrder");
 		
 		boolean check = true;
-		
-		CheckDeliveryman checkDeliveryman = new CheckDeliveryman();
-		check = checkDeliveryman.checkDeliveryman(variables, deliverymanID, orderID, statusID);
 		
 		GetFromDB getFromDB = new GetFromDB();
 		
@@ -50,7 +46,7 @@ public class DeliveryOrder {
 		try {
 			statementDelivery.setString(1, order.get("id_entrega"));
 			
-			order = getFromDB.getFromDB(statementDelivery);
+			delivery = getFromDB.getFromDB(statementDelivery);
 		}
 		catch (SQLException e) {
 			check = false;
@@ -62,17 +58,14 @@ public class DeliveryOrder {
 		}
 		
 		String updateDeliveryman = "UPDATE Entrega SET id_entregador = ? WHERE (id_entrega LIKE ?);";
-		PreparedStatement updateDeliveyman = DB.connect(variables).prepareStatement(updateDeliveryman);
+		PreparedStatement statementUpdateDeliveyman = DB.connect(variables).prepareStatement(updateDeliveryman);
 		
 		try {
 			if(check && delivery.get("id_entregador") == null || delivery.get("id_entregador").equals("null")) {
-				updateDeliveyman.setString(1, deliverymanID);
-				updateDeliveyman.setString(2, delivery.get("id_entrega"));
+				statementUpdateDeliveyman.setInt(1, Integer.parseInt(deliverymanID));
+				statementUpdateDeliveyman.setInt(2, Integer.parseInt(delivery.get("id_entrega")));
 				
-				updateDeliveyman.execute();
-			}
-			else {
-				check = false;
+				statementUpdateDeliveyman.execute();
 			}
 		}
 		catch (SQLException e) {
@@ -80,7 +73,7 @@ public class DeliveryOrder {
 			throw new SQLException(LogMessage.message(e.toString()));
 		}
 		finally {
-			updateDeliveyman.close();
+			statementUpdateDeliveyman.close();
 			DB.disconnect();
 		}
 		
@@ -89,15 +82,10 @@ public class DeliveryOrder {
 		PreparedStatement updateOrderStatus = DB.connect(variables).prepareStatement(updateStatus);
 		
 		try {
-			if(check && delivery.get("id_entregador") == null || delivery.get("id_entregador").equals("null")) {
-				updateOrderStatus.setString(1, statusID);
-				updateOrderStatus.setString(2, orderID);
-				
-				updateOrderStatus.execute();
-			}
-			else {
-				check = false;
-			}
+			updateOrderStatus.setInt(1, Integer.parseInt(statusID));
+			updateOrderStatus.setInt(2, Integer.parseInt(orderID));
+			
+			updateOrderStatus.execute();
 		}
 		catch (SQLException e) {
 			check = false;
