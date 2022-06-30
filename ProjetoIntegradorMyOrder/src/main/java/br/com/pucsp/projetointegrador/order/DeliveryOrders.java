@@ -28,7 +28,7 @@ public class DeliveryOrders {
 	
 	GetFromDB getFromDB = new GetFromDB();
 	
-	public JSONObject deliveryOrders(Map<String, String> variables, Map<String, String> cacheAddress, String deliverymanID) throws SQLException, NumberFormatException, MalformedURLException, IOException {
+	public JSONObject deliveryOrders(Map<String, String> variables, Map<String, String> cacheAddress, String deliverymanID, int statusID) throws SQLException, NumberFormatException, MalformedURLException, IOException {
 		log.entering(name, "deliveryOrders");
 		
 		StringBuilder payload = new StringBuilder();
@@ -40,7 +40,7 @@ public class DeliveryOrders {
 		createResource.object();
 		
 		try {
-			statement.setInt(1, 4);
+			statement.setInt(1, statusID);
 			
 			ResultSet orders = statement.executeQuery();
 			

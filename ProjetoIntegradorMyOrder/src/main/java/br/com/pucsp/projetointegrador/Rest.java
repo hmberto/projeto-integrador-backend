@@ -119,14 +119,14 @@ public class Rest {
 	}
 	
 	@GET
-	@Path("/delivery/orders/{deliverymanID}")
-	public Response deliveryOrders(@PathParam("deliverymanID") String deliverymanID) {
+	@Path("/delivery/orders/{deliverymanID}/{statusId}")
+	public Response deliveryOrders(@PathParam("deliverymanID") String deliverymanID, @PathParam("statusId") String statusId) {
 		log.entering(name, "deliveryOrders");
 		
 		DeliveryOrders deliveryOrders = new DeliveryOrders();
 		
 		try {
-			JSONObject payload = deliveryOrders.deliveryOrders(variables, cacheAddress, deliverymanID);
+			JSONObject payload = deliveryOrders.deliveryOrders(variables, cacheAddress, deliverymanID, Integer.parseInt(statusId));
 			
 			log.exiting(name, "deliveryOrders");
 			return Response.ok(payload.toString()).build();
