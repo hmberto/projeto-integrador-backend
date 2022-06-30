@@ -9,29 +9,8 @@ import java.util.Map;
 
 import br.com.pucsp.projetointegrador.order.db.DB;
 
-public class CheckDeliveryman {
-	public boolean checkDeliveryman(Map<String, String> variables, String deliverymanID, String orderID, String statusID) throws SQLException {
-		boolean check = true;
-
-		String sqlCheckOrders = "SELECT id_entrega from Compra WHERE (id_status LIKE ?)";
-		PreparedStatement statementOrders = DB.connect(variables).prepareStatement(sqlCheckOrders);
-
-		List<String> orderList = new ArrayList<String>();
-
-		try {
-			statementOrders.setString(1, statusID);
-
-			ResultSet g = statementOrders.executeQuery();
-			while (g.next()) {
-				orderList.add(g.getString(1));
-			}
-		} catch (SQLException e) {
-			throw new SQLException(LogMessage.message(e.toString()));
-		} finally {
-			statementOrders.close();
-			DB.disconnect();
-		}
-
+public class GetMyDelivery {
+	public String checkDeliveryman(Map<String, String> variables, String deliverymanID) throws SQLException {
 		String sqlCheckDeliveryman = "SELECT id_entrega from Entrega WHERE (id_entregador LIKE ?)";
 		PreparedStatement statementCheckDeliveryman = DB.connect(variables).prepareStatement(sqlCheckDeliveryman);
 
@@ -51,12 +30,10 @@ public class CheckDeliveryman {
 			DB.disconnect();
 		}
 		
-		for(int i = 0; i < deliveryList.size(); i++) {
-			if(orderList.contains(deliveryList.get(i))) {
-				check = false;
-			}
-		}
-
-		return check;
+		StringBuilder stringfy = new StringBuilder();
+		
+		stringfy.append(deliveryList.toString().replace("[", "").replace("]", ""));
+		
+		return stringfy.toString();
 	}
 }

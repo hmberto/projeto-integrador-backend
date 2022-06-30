@@ -16,7 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
-
 import br.com.pucsp.projetointegrador.order.CreateOrder;
 import br.com.pucsp.projetointegrador.order.DeliveryOrder;
 import br.com.pucsp.projetointegrador.order.DeliveryOrders;
@@ -25,6 +24,7 @@ import br.com.pucsp.projetointegrador.order.GetOrders;
 import br.com.pucsp.projetointegrador.order.Products;
 import br.com.pucsp.projetointegrador.order.create.NewOrder;
 import br.com.pucsp.projetointegrador.order.products.GetProducts;
+import br.com.pucsp.projetointegrador.order.utils.GetMyDelivery;
 import br.com.pucsp.projetointegrador.order.utils.LogMessage;
 import br.com.pucsp.projetointegrador.order.utils.ProjectVariables;
 
@@ -126,7 +126,32 @@ public class Rest {
 		DeliveryOrders deliveryOrders = new DeliveryOrders();
 		
 		try {
-			JSONObject payload = deliveryOrders.deliveryOrders(variables, cacheAddress, deliverymanID, Integer.parseInt(statusId));
+			String sql = "SELECT * FROM Compra WHERE (id_status LIKE ?)";
+			JSONObject payload = deliveryOrders.deliveryOrders(variables, cacheAddress, deliverymanID, Integer.parseInt(statusId), sql);
+			
+			log.exiting(name, "deliveryOrders");
+			return Response.ok(payload.toString()).build();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, LogMessage.message(e.toString()));
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	@GET
+	@Path("/delivery/orders/my/{deliverymanID}/{statusId}")
+	public Response myDeliveryOrders(@PathParam("deliverymanID") String deliverymanID, @PathParam("statusId") String statusId) {
+		log.entering(name, "deliveryOrders");
+		
+		DeliveryOrders deliveryOrders = new DeliveryOrders();
+		
+		try {
+			GetMyDelivery getMyDelivery = new GetMyDelivery();
+			String deliveryIds = getMyDelivery.checkDeliveryman(variables, deliverymanID);
+			
+			String sql = "SELECT * FROM Compra WHERE (id_status LIKE ?) AND id_entrega in (" + deliveryIds + ");";
+			
+			JSONObject payload = deliveryOrders.deliveryOrders(variables, cacheAddress, deliverymanID, Integer.parseInt(statusId), sql);
 			
 			log.exiting(name, "deliveryOrders");
 			return Response.ok(payload.toString()).build();

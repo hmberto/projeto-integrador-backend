@@ -28,13 +28,12 @@ public class DeliveryOrders {
 	
 	GetFromDB getFromDB = new GetFromDB();
 	
-	public JSONObject deliveryOrders(Map<String, String> variables, Map<String, String> cacheAddress, String deliverymanID, int statusID) throws SQLException, NumberFormatException, MalformedURLException, IOException {
+	public JSONObject deliveryOrders(Map<String, String> variables, Map<String, String> cacheAddress, String deliverymanID, int statusID, String sql) throws SQLException, NumberFormatException, MalformedURLException, IOException {
 		log.entering(name, "deliveryOrders");
 		
 		StringBuilder payload = new StringBuilder();
 		JSONWriter createResource = new JSONWriter(payload);
 		
-		String sql = "SELECT * FROM Compra WHERE (id_status LIKE ?)";
 		PreparedStatement statement = DB.connect(variables).prepareStatement(sql);
 		
 		createResource.object();
